@@ -1,0 +1,50 @@
+<ion-view view-title="BODEGA VENTAS">
+  <ion-content class="home" on-swipe-right="onSwipeRight($event)" on-swipe-left="onSwipeLeft($event)">
+
+    <div ng-if="!enableOp">
+      <br><br><br>
+      <center>
+      <h3>Escanee un código de producto para comenzar</h3>
+      </center>
+    </div>
+
+    <div ng-if="enableOp">
+      <h1>Artículo: {{info[0].IDArticulo}}</h1>
+      <hr />
+      <h3>{{info[0].Nombre}}</h3>
+      <h3 style='color:blue;'>Pasillo: {{info[0].Pasillo}} Lado: {{info[0].Lado}} <br /> Fila: {{info[0].Fila}} - Columna: {{info[0].Columna}} </h3>
+      <br />
+
+      <button style="margin-top:-6px;" class="button button-picking button-positive icon ion-plus-circled" ng-click="agregarEmparejado();"> Agregar Emparejado</button>   
+
+      <!--<button style="margin-top:-6px;" class="button button-picking button-royal icon ion-share" ng-click="reubicar();"> Reubicar BPM</button> -->
+
+      <hr />
+
+      <h4>Códigos emparejados</h4>
+        <h5 style='color:red;' ng-if="pareja.length == 0">NINGUNO</h5>
+        <div class="row row-one" ng-repeat="linea in pareja">
+          <table width="100%">
+            <tr>
+              <td width="50%">
+                <span class="linea-idarticulo">{{linea.CodigoBarra}}</span>            
+              </td>
+              <td>
+                <button style="margin-top:-6px;" class="button button-small button-picking button-assertive icon ion-close-circled" ng-click="borrarPareja(info[0].IDArticulo, linea.CodigoBarra);"> Borrar</button>               
+              </td>
+            </tr>
+          </table>
+          <br />
+        </div> 
+    </div>
+
+  </ion-content>
+  <ion-footer-bar class="bar-stable">
+    <div class="row">
+      <div class="col col-100 text-center">
+        <strong>ESTÁS EN LA BODEGA VENTAS</strong>
+      </div>
+    </div>
+    
+  </ion-footer-bar>
+</ion-view>

@@ -1,0 +1,38 @@
+<ion-view view-title="BODEGA VENTAS">
+  <ion-content class="home" on-swipe-right="onSwipeRight($event)" on-swipe-left="onSwipeLeft($event)">
+
+    <div ng-if="!enableOp">
+      <br><br><br>
+      <center>
+      <h3>Escanee un código de una ubicación para comenzar</h3>
+      </center>
+    </div>
+
+    <div ng-if="enableOp">
+      <h2 style='color:blue;'>Ubicación - {{pasillo}} {{lado}} <br /> Fila: {{fila}} - Columna: {{columna}} </h2>
+      <h4>Escanee codigo de productos para agregar a la ubicación actual</h4>
+      <br />
+      <!--<button style="margin-top:-6px;" class="button button-picking button-positive icon ion-plus-circled" ng-click="agregarEmparejado();"> Agregar Emparejado</button>   -->
+      <button style="margin-top:-6px;" class="button button-picking button-assertive icon ion-share" ng-click="cancelar();"> CANCELAR</button>   
+      <hr />
+
+      <h4>Códigos en la ubicación actual</h4>
+      <table>
+
+        <h5 style='color:red;' ng-if="pareja.length == 0">NINGUNO</h5>  
+        <div class="" on-double-click="borrar(linea.IDArticulo)" style="display:inline-block; margin-right: 20px; font-size: 25px; margin-bottom: 25px;" ng-repeat="linea in pareja">
+          <span style="padding:10px; " class="linea-idarticulo">{{linea.IDArticulo}}</span>
+        </div> 
+      </table>
+    </div>
+
+  </ion-content>
+  <ion-footer-bar class="bar-stable">
+    <div class="row">
+      <div class="col col-100 text-center">
+        <strong>ESTÁS EN LA BODEGA VENTAS</strong>
+      </div>
+    </div>
+    
+  </ion-footer-bar>
+</ion-view>
