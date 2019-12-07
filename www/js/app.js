@@ -1,5 +1,5 @@
 app = {
-  rest:  "http://192.168.8.100"
+  rest:  "http://proindar.enlanube.cl/require/load.php?call="
 };
 
 angular.module('andes', ['ionic', 'andes.controllers','ngStorage','peanuthub-custom-keyboard'])
@@ -8,6 +8,14 @@ angular.module('andes', ['ionic', 'andes.controllers','ngStorage','peanuthub-cus
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
+    localStorage.removeItem('user');
+    $rootScope.id = "";
+    $rootScope.nombre = "";
+    $rootScope.usercode = "";
+
+    if (window.cordova) {
+      $rootScope.usercode = "PROINDAR-PEOPLE-000005";
+    }
     if (window.cordova && window.cordova.plugins.Keyboard) {
       cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
       cordova.plugins.Keyboard.disableScroll(true);
@@ -176,36 +184,12 @@ angular.module('andes', ['ionic', 'andes.controllers','ngStorage','peanuthub-cus
       }
     }
   })
-  .state('main.conteo', {
-    url: '/conteo',
+  .state('main.entrega', {
+    url: '/entrega',
     views: {
       'menuContent': {
-        templateUrl: 'templates/conteo.html',
-        controller: 'ConteoCtrl'
-      }
-    },
-    params: {
-      warehouse: ''
-    }
-  })
-  .state('main.producto', {
-    url: '/producto',
-    views: {
-      'menuContent': {
-        templateUrl: 'templates/producto.html',
-        controller: 'ProductoCtrl'
-      }
-    },
-    params: {
-      warehouse: ''
-    }
-  })
-  .state('main.ubicacion', {
-    url: '/ubicacion',
-    views: {
-      'menuContent': {
-        templateUrl: 'templates/ubicacion.html',
-        controller: 'UbicacionCtrl'
+        templateUrl: 'templates/entrega.html',
+        controller: 'EntregaCtrl'
       }
     },
     params: {
@@ -276,23 +260,24 @@ document.addEventListener("online", function() {
   $rootScope.$apply();
 }, false);
 
+function usercode() {
+  var $body = angular.element(document.body);            // 1
+  var $rootScope = $body.injector().get('$rootScope');   // 2b
+  $rootScope.usercode = "8f14e45fceea167a5a36dedd4bea2543";
+  $rootScope.$broadcast("scanner", { });
+  $rootScope.$apply();
+} 
 function codigo() {
   var $body = angular.element(document.body);            // 1
   var $rootScope = $body.injector().get('$rootScope');   // 2b
-  $rootScope.$broadcast("scanner", { data: {success: true, data: "2020" } });
-  $rootScope.$apply();
-}
-function ubicacion() {
-  var $body = angular.element(document.body);            // 1
-  var $rootScope = $body.injector().get('$rootScope');   // 2b
-  $rootScope.$broadcast("scanner", { data: {success: true, data: "NORTE1" } });
+  $rootScope.barra = "EPP00CUE00A0067";
+  $rootScope.$broadcast("scanner", { });
   $rootScope.$apply();
 } 
 
-
 jQuery.ajaxSetup({
   type: 'POST',
-  timeout: 3000,
+  timeout: 5000,
   error: function(xhr) {
     console.log('AjaxSetup Error');
     
@@ -305,4 +290,15 @@ jQuery.ajaxSetup({
     //document.dispatchEvent(event);
   }
 });
+
+document.addEventListener('keypress', getInput, false);
+
+function getInput(e){
+  if (e.which == 13) {
+    var $body = angular.element(document.body);            // 1
+    var $rootScope = $body.injector().get('$rootScope');   // 2b
+    $rootScope.$broadcast("scanner", { });
+    $rootScope.$apply();
+  }
+}
 

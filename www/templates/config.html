@@ -1,28 +1,14 @@
 <ion-modal-view>
 <ion-header-bar class="bar-assertive">
-  <h1 class="title">Configuración grupo</h1>
+  <h1 class="title">CONÉCTATE</h1>
 </ion-header-bar>
-<ion-content>
-  <ion-list>
-  	<ion-radio ng-click="setGrupo(1)">grupo1</ion-radio>
-  	<ion-radio ng-click="setGrupo(2)">grupo2</ion-radio>
-  	<ion-radio ng-click="setGrupo(3)">grupo3</ion-radio>
-  	<ion-radio ng-click="setGrupo(4)">grupo4</ion-radio>
-  	<ion-radio ng-click="setGrupo(5)">grupo5</ion-radio>
-  	<ion-radio ng-click="setGrupo(6)">grupo6</ion-radio>
-  	<ion-radio ng-click="setGrupo(7)">grupo7</ion-radio>
-  	<ion-radio ng-click="setGrupo(8)">grupo8</ion-radio>
-  	<ion-radio ng-click="setGrupo(9)">grupo9</ion-radio>
-    <ion-radio ng-click="setGrupo(10)">grupo10</ion-radio>
-    <ion-radio ng-click="setGrupo(11)">grupo11</ion-radio>
-    <ion-radio ng-click="setGrupo(12)">grupo12</ion-radio>
-    <ion-radio ng-click="setGrupo(13)">grupo13</ion-radio>
-    <ion-radio ng-click="setGrupo(14)">grupo14</ion-radio>
-    <ion-radio ng-click="setGrupo(15)">grupo15</ion-radio>
-  </ion-list>
+<ion-content style="padding:15px; text-align:center;">
   <br /><br />
-  <button class="button button-block button-assertive" ng-click="confirmGrupo();">
-	Confirmar
-  </button>
+  <img src="proindar.png" style="max-width:100%;" />
+  <h4>Para comenzar<br />Escanea la tarjeta de usuario</h4>
+  <br />
+  <input type="text" ng-model="$root.usercode" readonly="readonly" style="background-color:#fbffbd; margin:auto; font-size: 25px;border:2px solid black;padding:6px;width:80%;" />
+  <br /><br />
+  <h4>Las operaciones se liberan según las credenciales de cada usuario</h4>
 </ion-content>
 </ion-modal-view>

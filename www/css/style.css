@@ -338,3 +338,14 @@ ion-content.pedido {
 	display:block;
 	font-size: 11px;
 }
+
+.bar-assertive {
+	background-color:#f39c12 !important;
+}
+.button-royal {
+	background-color:#042e7a !important;
+}
+.bar-footer .button {
+	height: 35px !important;
+	min-height: 35px !important;
+}

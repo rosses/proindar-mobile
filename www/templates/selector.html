@@ -1,23 +1,38 @@
-<ion-view view-title="TERRABIKE MOBILE">
+<ion-view view-title="BIENVENIDO">
   <ion-content class="home" on-swipe-right="onSwipeRight($event)" on-swipe-left="onSwipeLeft($event)">
 
     <div class="text-center homes">
-    <br /><br /><br /><br />
-    <button class="button button-royal button-default icon ion-podium" ng-click="CONTEO('BODEGA')"> TOMAR INVENTARIO</button>
-    <br /><br /><br /><br />
-    <button class="button button-royal button-default icon ion-podium" ng-click="CONSULTAR_PRODUCTO()"> CONSULTAR PRODUCTO</button>
-    <br /><br /><br /><br />
-    <button class="button button-royal button-default icon ion-podium" ng-click="INGRESO_UBICACION()"> AGREGAR A UBICACION</button>
-    <br /><br />
+      <br /><br />
+      <img src="proindar.png" style="max-width:100%;" />
+      <br />
+      <div ng-if="permiso_bodega_crear || permiso_bodega_vconsumo">
+        <h2>BODEGA</h2>
+        <button ng-if="permiso_bodega_crear" class="button button-royal button-default icon ion-qr-scanner" ng-click="ENTREGA()"> NUEVA ENTREGA</button>
+        <br /><br /><br />
+        <button ng-if="permiso_bodega_vconsumo" class="button button-royal button-default icon ion-qr-scanner" ng-click="CONSULTAR_PRODUCTO()"> VALE DE CONSUMO</button>
+        <br /><br /><br />
+      </div>
+      <div ng-if="permiso_prod_lotes || permiso_prod_traslado || permiso_prod_consulta">
+        <h2>PRODUCCIÓN</h2>
+        <br />
+        <button ng-if="permiso_prod_lotes" class="button button-royal button-default icon ion-qr-scanner" ng-click="CONSULTAR_PRODUCTO()"> GENERAR LOTES DESDE OT</button>
+        <br /><br /><br />
+        <button ng-if="permiso_prod_traslado" class="button button-royal button-default icon ion-qr-scanner" ng-click="CONSULTAR_PRODUCTO()"> TRASLADAR PIEZA</button>
+        <br /><br /><br />
+        <button ng-if="permiso_prod_consulta" class="button button-royal button-default icon ion-qr-scanner" ng-click="CONSULTAR_PRODUCTO()"> CONSULTAR PIEZA</button>
+        <br /><br /><br />
+      </div>
     </div>
 
   </ion-content>
   <ion-footer-bar class="bar-assertive">
     <div class="row">
-      <div class="col col-100 text-center">
-        <strong>SELECCIONAR OPERACI&Oacute;N</strong>
+      <div class="col col-67 text-center">
+        <strong>CONECTADO: {{$root.nombre}}</strong>
       </div>
-    </div>
-    
+      <div class="col col-33 text-center" style="margin-top: -10px;">
+        <button class="button button-dark" ng-click="close()">CERRAR CUENTA</button>
+      </div>
+    </div>    
   </ion-footer-bar>
 </ion-view>
