@@ -82,7 +82,6 @@ angular.module('andes.controllers', [])
       jQuery.post(app.rest+"ajax.mobile.producto.php", { barra: $rootScope.barra }, function(data) {
         $rootScope.hideload();
         $rootScope.barra = "";
-        $rootScope.custom_qty=1;
         if (data.error) {
           $rootScope.err(data.error);
           return;
@@ -91,7 +90,9 @@ angular.module('andes.controllers', [])
           itemcode: data.ItemCode,
           itemname: data.ItemName,
           qty: (isNaN($rootScope.custom_qty) ? 1 : parseInt($rootScope.custom_qty))
-        })
+        });
+        
+        $rootScope.custom_qty=1;
         $scope.$broadcast('scroll.resize');
        
       },"json").fail(function(err) {
@@ -173,7 +174,7 @@ angular.module('andes.controllers', [])
   });
 
   $scope.$on('scanner', function(event, args) {
-
+    $rootScope.$apply();
     if ($scope.scanner == "login") {
       $rootScope.showload();
       jQuery.post(app.rest+"ajax.mobile.login.php", { credential: $rootScope.usercode }, function(data) {

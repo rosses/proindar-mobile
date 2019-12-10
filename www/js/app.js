@@ -13,8 +13,8 @@ angular.module('andes', ['ionic', 'andes.controllers','ngStorage','peanuthub-cus
     $rootScope.nombre = "";
     $rootScope.usercode = "";
 
-    if (window.cordova) {
-      $rootScope.usercode = "PROINDAR-PEOPLE-000005";
+    if (!window.cordova) {
+      $rootScope.usercode = ""; /* for demo porposes */
     }
     if (window.cordova && window.cordova.plugins.Keyboard) {
       cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
