@@ -177,7 +177,7 @@ angular.module('andes.controllers', [])
     $rootScope.$apply();
     if ($scope.scanner == "login") {
       $rootScope.showload();
-      jQuery.post(app.rest+"ajax.mobile.login.php", { credential: $rootScope.usercode }, function(data) {
+      jQuery.post(app.rest+"ajax.mobile.login.php", { credential: document.getElementById('loginmd5').value }, function(data) {
         $rootScope.usercode = "";
         $rootScope.hideload();
         if (data.error) {
