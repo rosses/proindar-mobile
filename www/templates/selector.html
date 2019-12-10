@@ -9,13 +9,13 @@
         <h2>BODEGA</h2>
         <button ng-if="permiso_bodega_crear" class="button button-royal button-default icon ion-qr-scanner" ng-click="ENTREGA()"> NUEVA ENTREGA</button>
         <br /><br /><br />
-        <button ng-if="permiso_bodega_vconsumo" class="button button-royal button-default icon ion-qr-scanner" ng-click="CONSULTAR_PRODUCTO()"> VALE DE CONSUMO</button>
+        <button ng-if="permiso_bodega_vconsumo" class="button button-royal button-default icon ion-qr-scanner" ng-click="VALE_CONSUMO()"> VALE DE CONSUMO</button>
         <br /><br /><br />
       </div>
       <div ng-if="permiso_prod_lotes || permiso_prod_traslado || permiso_prod_consulta">
         <h2>PRODUCCIÓN</h2>
         <br />
-        <button ng-if="permiso_prod_lotes" class="button button-royal button-default icon ion-qr-scanner" ng-click="CONSULTAR_PRODUCTO()"> GENERAR LOTES DESDE OT</button>
+        <button ng-if="permiso_prod_lotes" class="button button-royal button-default icon ion-qr-scanner" ng-click="GENERAR_LOTES()"> GENERAR LOTES DESDE OT</button>
         <br /><br /><br />
         <button ng-if="permiso_prod_traslado" class="button button-royal button-default icon ion-qr-scanner" ng-click="CONSULTAR_PRODUCTO()"> TRASLADAR PIEZA</button>
         <br /><br /><br />

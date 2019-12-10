@@ -349,3 +349,6 @@ ion-content.pedido {
 	height: 35px !important;
 	min-height: 35px !important;
 }
+.modallle label {
+	text-align:left;
+}

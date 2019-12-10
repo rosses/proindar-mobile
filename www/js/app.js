@@ -196,6 +196,30 @@ angular.module('andes', ['ionic', 'andes.controllers','ngStorage','peanuthub-cus
       warehouse: ''
     }
   })
+  .state('main.valeconsumo', {
+    url: '/valeconsumo',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/valeconsumo.html',
+        controller: 'ValeCtrl'
+      }
+    },
+    params: {
+      warehouse: ''
+    }
+  })
+  .state('main.makelote', {
+    url: '/makelote',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/makelote.html',
+        controller: 'MakeloteCtrl'
+      }
+    },
+    params: {
+      warehouse: ''
+    }
+  })
 
   //$urlRouterProvider.otherwise('/main/home');
 })
@@ -263,17 +287,24 @@ document.addEventListener("online", function() {
 function usercode() {
   var $body = angular.element(document.body);            // 1
   var $rootScope = $body.injector().get('$rootScope');   // 2b
-  $rootScope.usercode = "8f14e45fceea167a5a36dedd4bea2543";
+  document.getElementById('md5login').value = "8f14e45fceea167a5a36dedd4bea2543";
   $rootScope.$broadcast("scanner", { });
   $rootScope.$apply();
 } 
 function codigo() {
   var $body = angular.element(document.body);            // 1
   var $rootScope = $body.injector().get('$rootScope');   // 2b
-  $rootScope.barra = "EPP00CUE00A0067";
+  document.getElementById('textbox_barra').value = "EPP00CUE00A0067";
   $rootScope.$broadcast("scanner", { });
   $rootScope.$apply();
 } 
+function consumo() {
+  var $body = angular.element(document.body);            // 1
+  var $rootScope = $body.injector().get('$rootScope');   // 2b
+  document.getElementById('textbox_consumo').value = "VC00001000005";
+  $rootScope.$broadcast("scanner", { });
+  $rootScope.$apply();  
+}
 
 jQuery.ajaxSetup({
   type: 'POST',
