@@ -535,6 +535,175 @@ angular.module('andes.controllers', [])
   }
   document.getElementById('textbox_ott').focus();
 })
+.controller('MoverCtrl', function($scope, $state, $rootScope, $localStorage, $ionicModal, $http, $location, $timeout, $ionicLoading, $ionicPopup, $ionicHistory, $stateParams, $ionicPlatform) {
+  $rootScope.enInicio = 0;
+  var deregisterFirst = $ionicPlatform.registerBackButtonAction(
+    function() {
+      $ionicHistory.nextViewOptions({
+          historyRoot: true
+      });
+      $state.go('main.selector');
+    }, 100
+  );
+  $scope.$on('$destroy', deregisterFirst);
+
+  $scope.warehouse = $stateParams.warehouse;
+  $scope.popCloseable = null;
+  $rootScope.barra = '';
+  $scope.modoEscaner = 'leer';
+  $scope.enableOp = true;
+  $scope.inventory = [];
+  $scope.conteo = 0;
+  $scope.custom_c = 1;
+
+  $scope.grupo = localStorage.getItem('ocip');
+
+  $scope.$on('$ionicView.enter', function(obj, viewData){
+    if (window.cordova) { window.cordova.plugins.honeywell.enableTrigger(() => console.info('trigger enabled')); }
+    if (viewData.direction == 'back') {
+      $scope.popCloseable = null;
+      $rootScope.barra = '';
+      $scope.modoEscaner = 'leer';
+      $scope.enableOp = true;
+      $scope.inventory = [];
+      $scope.receptor = "";
+      $scope.bodega = "";
+    }
+  });
+
+  $scope.$on('$ionicView.beforeLeave', function(obj, viewData){
+    $scope.popCloseable = null;
+    $rootScope.barra = '';
+    $scope.modoEscaner = 'leer';
+    $scope.enableOp = true;
+    $scope.inventory = [];
+    $scope.receptor = "";
+    $scope.bodega = "";
+  }); 
+
+  $scope.cancelar = function() {
+    $scope.popCloseable = null;
+    $scope.barra = '';
+    $scope.modoEscaner = 'leer';
+    $scope.enableOp = false;
+    $scope.inventory = [];
+  }
+  $scope.borrar = function (IdArticulo) {
+
+  };
+
+  $scope.$on('scanner', function(event, args) {
+    if ($scope.modoEscaner == "leer") {
+      $rootScope.barra = document.getElementById('textbox_moveme').value;
+      $rootScope.showload();
+      jQuery.post(app.rest+"ajax.mobile.data.php&a=pieza", { barra: $rootScope.barra }, function(data) {
+        $rootScope.hideload();
+        $rootScope.barra = "";
+        if (data.error) {
+          $rootScope.err(data.error);
+          return;
+        }
+
+        var found = 0;
+        for (var i = 0; i < $scope.inventory.length; i++) {
+          if ($scope.inventory[i].itemcode == data.ItemCode) {
+            found = 1;
+            $scope.inventory[i].qty += parseInt($rootScope.custom_qty);
+            break;
+          }
+        }
+
+        if (found == 0) {
+          $scope.inventory.push({
+            itemcode: data.ItemCode,
+            itemname: data.ItemName,
+            qty: (isNaN($rootScope.custom_qty) ? 1 : parseInt($rootScope.custom_qty))
+          });
+        } 
+        
+        $rootScope.custom_qty=1;
+        $scope.$broadcast('scroll.resize');
+        $rootScope.$apply();
+        document.getElementById('textbox_moveme').focus();
+
+
+       
+      },"json").fail(function(err) {
+        $rootScope.hideload(); 
+        $rootScope.barra = "";
+        $rootScope.$apply();
+        $rootScope.err(err.error);
+        document.getElementById('textbox_moveme').focus();
+      });
+
+    }
+
+  });
+
+  $scope.modalSalida = null;
+  $scope.receptor = "";
+  $scope.bodega = "";
+  $scope.receptores = [];
+  $scope.bodegas = [];
+
+
+  $ionicModal.fromTemplateUrl('templates/finish_salida.html', {
+    scope: $scope,
+    animation: 'slide-in-up'
+  }).then(function(modal) {
+    $scope.modalSalida = modal;
+  });
+  $scope.closeSalida = function() {
+    $scope.modalSalida.hide();
+  }
+  $scope.finishConteo = function() {
+    if ($scope.inventory.length == 0) {
+      $rootScope.err("Salida vacia, revise nuevamente");
+    }
+    else {
+      $scope.receptor = "";
+      $scope.bodega = "";
+      $scope.receptores = [];
+      $scope.bodegas = [];
+      $rootScope.showload();
+      jQuery.get(app.rest+"ajax.mobile.data.php&a=employee", function(data) {
+        $scope.receptores = data;
+      },"json");
+      jQuery.get(app.rest+"ajax.mobile.data.php&a=whs", function(data) {
+        $rootScope.hideload();
+        $scope.modalSalida.show();
+        $scope.bodegas = data;
+      },"json");
+
+
+    }
+  }
+  $scope.confirmada = function() {
+    if ($scope.bodega == "") {
+      $rootScope.err("Indique bodega");
+      return;
+    }
+
+    if ($scope.receptor == "") {
+      $rootScope.err("Indique receptor de mercancias");
+      return;
+    }
+    $rootScope.confirmar("Esta seguro?", function() {
+      $rootScope.showload();
+    });
+  };
+  $scope.cancelarEntrega = function() {
+    $rootScope.confirmar("Anular proceso?", function() {
+      $ionicHistory.nextViewOptions({
+          historyRoot: true
+      });
+      $state.go('main.selector');
+    }, function() {
+    });
+
+  }
+  document.getElementById('textbox_moveme').focus();
+})
 .controller('MainCtrl', function($scope, $state, $localStorage, $timeout, $interval, $ionicModal, $rootScope, $location, $ionicLoading, $ionicSideMenuDelegate, $ionicHistory) {
 
   $ionicSideMenuDelegate.canDragContent(false);
@@ -626,6 +795,16 @@ angular.module('andes.controllers', [])
     $ionicHistory.clearCache();
     $state.go('main.makelote');
   };
+
+  $scope.MOVER_PIEZA = function() {
+    $ionicHistory.nextViewOptions({
+        historyRoot: true
+    });
+    $ionicHistory.clearCache();
+    $state.go('main.mover');
+  };
+
+  
 
   $scope.STOCK = function() {
     $rootScope.showload();

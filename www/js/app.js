@@ -220,6 +220,18 @@ angular.module('andes', ['ionic', 'andes.controllers','ngStorage','peanuthub-cus
       warehouse: ''
     }
   })
+  .state('main.mover', {
+    url: '/mover',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/mover.html',
+        controller: 'MoverCtrl'
+      }
+    },
+    params: {
+      warehouse: ''
+    }
+  })
 
   //$urlRouterProvider.otherwise('/main/home');
 })
