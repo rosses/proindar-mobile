@@ -640,6 +640,33 @@ angular.module('andes.controllers', [])
 
   });
 
+  $scope.MOVER = function(gol) {
+
+      $rootScope.barra = document.getElementById('textbox_moveme').value;
+      $rootScope.showload();
+      jQuery.post(app.rest+"ajax.mobile.data.php&a=mover", { barra: $rootScope.barra, etapa: gol }, function(data) {
+        $rootScope.hideload();
+        $rootScope.barra = "";
+        if (data.error) {
+          $rootScope.err(data.error);
+          return;
+        }
+
+        $rootScope.ok("Listo");
+        $scope.$broadcast('scroll.resize');
+        $rootScope.$apply();
+        document.getElementById('textbox_moveme').focus();
+
+      },"json").fail(function(err) {
+        $rootScope.hideload(); 
+        $rootScope.barra = "";
+        $rootScope.$apply();
+        $rootScope.err(err.error);
+        document.getElementById('textbox_moveme').focus();
+      });
+
+  }
+
   $scope.modalSalida = null;
   $scope.receptor = "";
   $scope.bodega = "";

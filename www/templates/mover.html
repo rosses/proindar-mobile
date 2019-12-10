@@ -16,6 +16,11 @@
       <hr />
       <ion-scroll direction="y" style="height: calc(100vh - 250px)">
          
+         <button class="button button-royal button-default icon ion-qr-scanner" ng-click="MOVER(1)"> CORTE</button>
+         <button class="button button-royal button-default icon ion-qr-scanner" ng-click="MOVER(2)"> ARMADO</button>
+         <button class="button button-royal button-default icon ion-qr-scanner" ng-click="MOVER(3)"> LIMPIEZA</button>
+         <button class="button button-royal button-default icon ion-qr-scanner" ng-click="MOVER(4)"> CALIDAD</button>
+         <button class="button button-royal button-default icon ion-qr-scanner" ng-click="MOVER(5)"> GALVANIZADO</button>
           
          
       </ion-scroll>
@@ -25,8 +30,7 @@
   <ion-footer-bar class="bar-stable">
     <div class="row">
       <div class="col col-100 text-center" style="margin-top: -10px;">
-        <button class="button button-dark" ng-click="cancelarEntrega()">CANCELAR</button>
-        <button class="button button-assertive button-small" ng-if="enableOp" ng-click="finishConteo()">ENVIAR A SAP</button>
+        <button class="button button-dark" ng-click="cancelarEntrega()">CANCELAR</button> 
       </div>
     </div>
     
