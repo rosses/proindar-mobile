@@ -8,7 +8,7 @@ angular.module('andes', ['ionic', 'andes.controllers','ngStorage','peanuthub-cus
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
-    localStorage.removeItem('user');
+    //localStorage.removeItem('user');
     $rootScope.id = "";
     $rootScope.nombre = "";
     $rootScope.usercode = "";
@@ -313,11 +313,31 @@ function codigo() {
 function consumo() {
   var $body = angular.element(document.body);            // 1
   var $rootScope = $body.injector().get('$rootScope');   // 2b
-  document.getElementById('textbox_consumo').value = "VC00001000005";
+  document.getElementById('textbox_consumo').value = "VC0000100000005";
   $rootScope.$broadcast("scanner", { });
   $rootScope.$apply();  
 }
-
+function ot() {
+  var $body = angular.element(document.body);            // 1
+  var $rootScope = $body.injector().get('$rootScope');   // 2b
+  document.getElementById('textbox_ott').value = "OT00000001";
+  $rootScope.$broadcast("scanner", { });
+  $rootScope.$apply();  
+}
+function pieza() {
+  var $body = angular.element(document.body);            // 1
+  var $rootScope = $body.injector().get('$rootScope');   // 2b
+  document.getElementById('textbox_box').value = "1219000010005";
+  $rootScope.$broadcast("scanner", { });
+  $rootScope.$apply();  
+}
+function pieza2() {
+  var $body = angular.element(document.body);            // 1
+  var $rootScope = $body.injector().get('$rootScope');   // 2b
+  document.getElementById('textbox_moveme').value = "1219000010005";
+  $rootScope.$broadcast("scanner", { });
+  $rootScope.$apply();  
+}
 jQuery.ajaxSetup({
   type: 'POST',
   timeout: 5000,

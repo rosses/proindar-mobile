@@ -142,14 +142,14 @@ angular.module('andes.controllers', [])
       },"json");
       jQuery.get(app.rest+"ajax.mobile.data.php&a=whs", function(data) {
         $rootScope.hideload();
-        $scope.modalSalida.show();
         $scope.bodegas = data;
+        $scope.modalSalida.show();
       },"json");
-
-
     }
   }
-  $scope.confirmada = function() {
+  $scope.setreceptor = function(x) { $scope.receptor = x; }
+  $scope.setbodega = function(x) { $scope.bodega = x; }
+  $scope.confirmada = function() {  
     if ($scope.bodega == "") {
       $rootScope.err("Indique bodega");
       return;
@@ -160,11 +160,29 @@ angular.module('andes.controllers', [])
       return;
     }
     $rootScope.confirmar("Esta seguro?", function() {
+
       $rootScope.showload();
+      jQuery.post(app.rest+"ajax.mobile.data.php&a=SendEntrega", {
+        bodega: $scope.bodega,
+        receptor: $scope.receptor,
+        items: $scope.inventory, 
+        autor: localStorage.getItem('user')
+      }, function(data) {
+        $rootScope.hideload();
+        if (data.error) {
+          $rootScope.err(data.error);
+        }
+        else {
+          $rootScope.ok(data.msg);
+          $scope.inventory = [];
+          $scope.modalSalida.hide();
+        }        
+      },"json");
+
     });
   };
   $scope.cancelarEntrega = function() {
-    $rootScope.confirmar("Anular entrega?", function() {
+    $rootScope.confirmar("Volver al inicio?", function() {
       $ionicHistory.nextViewOptions({
           historyRoot: true
       });
@@ -191,7 +209,7 @@ angular.module('andes.controllers', [])
   $scope.popCloseable = null;
   $rootScope.barra = '';
   $scope.modoEscaner = 'leer';
-  $scope.enableOp = true;
+  $scope.enableOp = false;
   $scope.inventory = [];
   $scope.conteo = 0;
   $scope.custom_c = 1;
@@ -204,8 +222,8 @@ angular.module('andes.controllers', [])
       $scope.popCloseable = null;
       $rootScope.barra = '';
       $scope.modoEscaner = 'leer';
-      $scope.enableOp = true;
-      $scope.inventory = [];
+      $scope.enableOp = false;
+      $scope.vale = null;
       $scope.receptor = "";
       $scope.bodega = "";
     }
@@ -215,8 +233,8 @@ angular.module('andes.controllers', [])
     $scope.popCloseable = null;
     $rootScope.barra = '';
     $scope.modoEscaner = 'leer';
-    $scope.enableOp = true;
-    $scope.inventory = [];
+    $scope.enableOp = false;
+    $scope.vale = null;
     $scope.receptor = "";
     $scope.bodega = "";
   }); 
@@ -226,31 +244,16 @@ angular.module('andes.controllers', [])
     $scope.barra = '';
     $scope.modoEscaner = 'leer';
     $scope.enableOp = false;
-    $scope.inventory = [];
+    $scope.vale = null;
+    $scope.receptor = "";
+    $scope.bodega = "";
+  }
+  $scope.formatQty = function(x) {
+    return parseFloat( x ) || 0;
   }
   $scope.borrar = function (IdArticulo) {
     $rootScope.confirmar('Desea reiniciar el artículo: '+IdArticulo+'?', function() {
       $rootScope.showload();
-
-      if (window.cordova) { window.cordova.plugins.honeywell.disableTrigger(() => console.info('trigger disabled')); }
-
-      $http.post(app.rest+"/locations/"+$scope.barra+"/reset",{
-        product_code: IdArticulo
-      }).then((data) => {
-        $rootScope.hideload();
-        if (window.cordova) { window.cordova.plugins.honeywell.enableTrigger(() => console.info('trigger enabled')); }
-        $rootScope.custom_qty=1;
-        $scope.inventory = data.data.inventory;
-        $scope.$broadcast('scroll.resize');
-       
-      },(err) => {
-        $rootScope.hideload();
-        if (window.cordova) { navigator.notification.beep(1); }
-        $rootScope.err(err.data.error, function() {
-          if (window.cordova) { window.cordova.plugins.honeywell.enableTrigger(() => console.info('trigger enabled')); }
-        });
-      });
-
     });
   };
 
@@ -266,29 +269,12 @@ angular.module('andes.controllers', [])
           return;
         }
 
-        var found = 0;
-        for (var i = 0; i < $scope.inventory.length; i++) {
-          if ($scope.inventory[i].itemcode == data.ItemCode) {
-            found = 1;
-            $scope.inventory[i].qty += parseInt($rootScope.custom_qty);
-            break;
-          }
-        }
+        $scope.enableOp = true;
+        $scope.vale = data;
 
-        if (found == 0) {
-          $scope.inventory.push({
-            itemcode: data.ItemCode,
-            itemname: data.ItemName,
-            qty: (isNaN($rootScope.custom_qty) ? 1 : parseInt($rootScope.custom_qty))
-          });
-        } 
-        
-        $rootScope.custom_qty=1;
         $scope.$broadcast('scroll.resize');
         $rootScope.$apply();
         document.getElementById('textbox_consumo').focus();
-
-
        
       },"json").fail(function(err) {
         $rootScope.hideload(); 
@@ -315,14 +301,27 @@ angular.module('andes.controllers', [])
   }).then(function(modal) {
     $scope.modalSalida = modal;
   });
+  $scope.setreceptor = function(x) { $scope.receptor = x; }
+  $scope.setbodega = function(x) { $scope.bodega = x; }
   $scope.closeSalida = function() {
     $scope.modalSalida.hide();
   }
-  $scope.finishConteo = function() {
-    if ($scope.inventory.length == 0) {
-      $rootScope.err("Salida vacia, revise nuevamente");
+  $scope.finishValeconsumo = function() {
+    if ($scope.vale.items.length == 0) {
+      $rootScope.err("Vale sin lineas");
     }
     else {
+      var sumado = 0;
+      for (var i = 0; i < $scope.vale.items.length; i++) {
+        var parcial = parseFloat($scope.vale.items[i].parcial);
+        sumado += parcial;
+      }
+
+      if (sumado <= 0) {
+        $rootScope.err("Suma de cantidades parciales deben ser mayor a cero");
+        return false;
+      }
+
       $scope.receptor = "";
       $scope.bodega = "";
       $scope.receptores = [];
@@ -345,16 +344,34 @@ angular.module('andes.controllers', [])
       $rootScope.err("Indique bodega");
       return;
     }
-
     if ($scope.receptor == "") {
       $rootScope.err("Indique receptor de mercancias");
       return;
     }
     $rootScope.confirmar("Esta seguro?", function() {
       $rootScope.showload();
+      jQuery.post(app.rest+"ajax.mobile.data.php&a=SendVC", {
+        bodega: $scope.bodega,
+        receptor: $scope.receptor,
+        vale: $scope.vale, 
+        autor: localStorage.getItem('user')
+      }, function(data) {
+        $rootScope.hideload();
+        if (data.error) {
+          $rootScope.err(data.error);
+        }
+        else {
+          $rootScope.ok(data.msg);
+          $scope.vale = null;
+          $scope.enableOp = false;
+          $scope.modalSalida.hide();
+        }        
+      },"json");
+
+
     });
   };
-  $scope.cancelarEntrega = function() {
+  $scope.cancelarValeConsumo = function() {
     $rootScope.confirmar("Anular captura del vale de consumo?", function() {
       $ionicHistory.nextViewOptions({
           historyRoot: true
@@ -362,7 +379,17 @@ angular.module('andes.controllers', [])
       $state.go('main.selector');
     }, function() {
     });
+  }
+  $scope.moveParcial = function(index,variation) {
+    var p = parseFloat($scope.vale.items[index].parcial);
+    var q = parseFloat($scope.vale.items[index].quantity);
+    
+    if (p+variation > q || p+variation < 0) {
+      return false;
+    }
 
+    p += variation;
+    $scope.vale.items[index].parcial = ""+(p)+"";
   }
   document.getElementById('textbox_consumo').focus();
 })
@@ -380,12 +407,12 @@ angular.module('andes.controllers', [])
 
   $scope.warehouse = $stateParams.warehouse;
   $scope.popCloseable = null;
-  $rootScope.barra = '';
+  $scope.barra = '';
+  $scope.pieza = '';
+  $scope.packet = [];
   $scope.modoEscaner = 'leer';
-  $scope.enableOp = true;
-  $scope.inventory = [];
-  $scope.conteo = 0;
-  $scope.custom_c = 1;
+  $scope.enableOp = false;
+  $scope.ot = null;
 
   $scope.grupo = localStorage.getItem('ocip');
 
@@ -393,120 +420,158 @@ angular.module('andes.controllers', [])
     if (window.cordova) { window.cordova.plugins.honeywell.enableTrigger(() => console.info('trigger enabled')); }
     if (viewData.direction == 'back') {
       $scope.popCloseable = null;
-      $rootScope.barra = '';
+      $scope.barra = '';
+      $scope.pieza = '';
+      $scope.packet = [];
       $scope.modoEscaner = 'leer';
-      $scope.enableOp = true;
-      $scope.inventory = [];
-      $scope.receptor = "";
-      $scope.bodega = "";
+      $scope.enableOp = false;
+      $scope.ot = null;
     }
   });
 
   $scope.$on('$ionicView.beforeLeave', function(obj, viewData){
     $scope.popCloseable = null;
-    $rootScope.barra = '';
+    $scope.barra = '';
+    $scope.pieza = '';
+    $scope.packet = [];
     $scope.modoEscaner = 'leer';
-    $scope.enableOp = true;
-    $scope.inventory = [];
-    $scope.receptor = "";
-    $scope.bodega = "";
+    $scope.enableOp = false;
+    $scope.ot = null;
   }); 
 
   $scope.cancelar = function() {
     $scope.popCloseable = null;
     $scope.barra = '';
+    $scope.pieza = '';
+    $scope.packet = [];
     $scope.modoEscaner = 'leer';
     $scope.enableOp = false;
-    $scope.inventory = [];
+    $scope.ot = null;
   }
-  $scope.borrar = function (IdArticulo) {
-
+  $scope.borrar = function (internalcode) {
+    $rootScope.confirmar('Quitar pieza?', function() {
+      for (var i = 0; i < $scope.packet.length; i++) {
+        if ($scope.packet[i].internalcode == internalcode) {
+          $scope.packet.splice(i,1);
+          break;
+        }
+      }
+    });
   };
 
   $scope.$on('scanner', function(event, args) {
     if ($scope.modoEscaner == "leer") {
-      $rootScope.barra = document.getElementById('textbox_ott').value;
+      $scope.barra = document.getElementById('textbox_ott').value;
       $rootScope.showload();
-      jQuery.post(app.rest+"ajax.mobile.data.php&a=Pieza", { barra: $rootScope.barra }, function(data) {
+      jQuery.post(app.rest+"ajax.mobile.data.php&a=ot", { barra: $scope.barra }, function(data) {
         $rootScope.hideload();
-        $rootScope.barra = "";
         if (data.error) {
           $rootScope.err(data.error);
           return;
         }
-
-        var found = 0;
-        for (var i = 0; i < $scope.inventory.length; i++) {
-          if ($scope.inventory[i].itemcode == data.ItemCode) {
-            found = 1;
-            $scope.inventory[i].qty += parseInt($rootScope.custom_qty);
-            break;
-          }
-        }
-
-        if (found == 0) {
-          $scope.inventory.push({
-            itemcode: data.ItemCode,
-            itemname: data.ItemName,
-            qty: (isNaN($rootScope.custom_qty) ? 1 : parseInt($rootScope.custom_qty))
-          });
-        } 
-        
-        $rootScope.custom_qty=1;
+        $scope.ot = data;
+        $scope.enableOp = true;
+        $scope.packet = [];
+        $scope.modoEscaner = "lotear";
         $scope.$broadcast('scroll.resize');
         $rootScope.$apply();
-        document.getElementById('textbox_ott').focus();
+        document.getElementById('textbox_box').focus();
 
 
        
       },"json").fail(function(err) {
         $rootScope.hideload(); 
-        $rootScope.barra = "";
         $rootScope.$apply();
         $rootScope.err(err.error);
         document.getElementById('textbox_ott').focus();
       });
 
     }
+    else if ($scope.modoEscaner == "lotear") {
+
+      $scope.pieza = document.getElementById('textbox_box').value;
+      $rootScope.showload();
+      jQuery.post(app.rest+"ajax.mobile.data.php&a=pieza&to=packet", { barra: $scope.pieza }, function(data) {
+        $rootScope.hideload();
+        $scope.pieza = "";
+        $rootScope.$apply();
+        if (data.error) {
+          $rootScope.err(data.error);
+          return;
+        }
+
+        var add = 1;
+        for (var i = 0; i < $scope.packet.length; i++) {
+          if ($scope.packet[i].internalcode == data.internalcode) {
+            $rootScope.err("Pieza ya existe en este lote");
+            add = 0;
+            break;
+          }
+        }
+
+        if (add==1) {
+          $scope.packet.push({
+            mark: data.mark,
+            dimtype: data.dimtype,
+            kg: parseFloat(data.totalkg),
+            internalcode: data.internalcode
+          });
+        }
+
+        $scope.$broadcast('scroll.resize');
+        $rootScope.$apply();
+        document.getElementById('textbox_box').focus();
+
+
+       
+      },"json").fail(function(err) {
+        $rootScope.hideload(); 
+        $scope.pieza = "";
+        $rootScope.$apply();
+        $rootScope.err(err.error);
+        document.getElementById('textbox_box').focus();
+      });
+
+    } 
 
   });
 
-  $scope.modalSalida = null;
-  $scope.receptor = "";
-  $scope.bodega = "";
-  $scope.receptores = [];
-  $scope.bodegas = [];
 
+  $scope.finishLote = function() {
 
-  $ionicModal.fromTemplateUrl('templates/finish_salida.html', {
-    scope: $scope,
-    animation: 'slide-in-up'
-  }).then(function(modal) {
-    $scope.modalSalida = modal;
-  });
-  $scope.closeSalida = function() {
-    $scope.modalSalida.hide();
-  }
-  $scope.finishConteo = function() {
-    if ($scope.inventory.length == 0) {
-      $rootScope.err("Salida vacia, revise nuevamente");
+    if ($scope.packet.length == 0) {
+      $rootScope.err("Lote vacio, revise nuevamente");
     }
     else {
-      $scope.receptor = "";
-      $scope.bodega = "";
-      $scope.receptores = [];
-      $scope.bodegas = [];
-      $rootScope.showload();
-      jQuery.get(app.rest+"ajax.mobile.data.php&a=employee", function(data) {
-        $scope.receptores = data;
-      },"json");
-      jQuery.get(app.rest+"ajax.mobile.data.php&a=whs", function(data) {
-        $rootScope.hideload();
-        $scope.modalSalida.show();
-        $scope.bodegas = data;
-      },"json");
+      $rootScope.confirmar("Se generará un lote y se moveran las piezas a la próxima etapa. Desea continuar?", function() {
+        $rootScope.showload();
+        jQuery.post(app.rest+"ajax.mobile.data.php&a=crearLote", { 
+          ot: $scope.ot.id,
+          packet: $scope.packet,
+          autor: localStorage.getItem('user')
+        }, function(data) {
+          $rootScope.hideload();
+  
+          if (data.error) {
+            $rootScope.err(data.error);
+            return;
+          }
 
+          $scope.barra = '';
+          $scope.pieza = '';
+          $scope.packet = [];
+          $scope.modoEscaner = 'leer';
+          $scope.enableOp = false;
+          $scope.ot = null;
 
+          $rootScope.ok(data.msg);
+
+          $scope.$broadcast('scroll.resize');
+          $rootScope.$apply();
+          document.getElementById('textbox_ott').focus();
+          
+        },"json");
+      });
     }
   }
   $scope.confirmada = function() {
@@ -523,7 +588,7 @@ angular.module('andes.controllers', [])
       $rootScope.showload();
     });
   };
-  $scope.cancelarEntrega = function() {
+  $scope.cancelarLote = function() {
     $rootScope.confirmar("Anular armado del lote?", function() {
       $ionicHistory.nextViewOptions({
           historyRoot: true
@@ -547,38 +612,31 @@ angular.module('andes.controllers', [])
   );
   $scope.$on('$destroy', deregisterFirst);
 
-  $scope.warehouse = $stateParams.warehouse;
-  $scope.popCloseable = null;
-  $rootScope.barra = '';
+  $scope.barra = '';
   $scope.modoEscaner = 'leer';
-  $scope.enableOp = true;
-  $scope.inventory = [];
-  $scope.conteo = 0;
-  $scope.custom_c = 1;
-
-  $scope.grupo = localStorage.getItem('ocip');
+  $scope.enableOp = false;
+  $scope.packet = [];
+  $scope.ejecutor = "";
 
   $scope.$on('$ionicView.enter', function(obj, viewData){
     if (window.cordova) { window.cordova.plugins.honeywell.enableTrigger(() => console.info('trigger enabled')); }
     if (viewData.direction == 'back') {
       $scope.popCloseable = null;
-      $rootScope.barra = '';
+      $scope.barra = '';
       $scope.modoEscaner = 'leer';
-      $scope.enableOp = true;
-      $scope.inventory = [];
-      $scope.receptor = "";
-      $scope.bodega = "";
+      $scope.enableOp = false;
+      $scope.packet = [];
+      $scope.ejecutor = "";
     }
   });
 
   $scope.$on('$ionicView.beforeLeave', function(obj, viewData){
     $scope.popCloseable = null;
-    $rootScope.barra = '';
+    $scope.barra = '';
     $scope.modoEscaner = 'leer';
-    $scope.enableOp = true;
-    $scope.inventory = [];
-    $scope.receptor = "";
-    $scope.bodega = "";
+    $scope.enableOp = false;
+    $scope.packet = [];
+    $scope.ejecutor = "";
   }); 
 
   $scope.cancelar = function() {
@@ -586,48 +644,60 @@ angular.module('andes.controllers', [])
     $scope.barra = '';
     $scope.modoEscaner = 'leer';
     $scope.enableOp = false;
-    $scope.inventory = [];
+    $scope.packet = [];
+    $scope.ejecutor = "";
   }
   $scope.borrar = function (IdArticulo) {
 
   };
 
   $scope.$on('scanner', function(event, args) {
-    if ($scope.modoEscaner == "leer") {
-      $rootScope.barra = document.getElementById('textbox_moveme').value;
+    if ($scope.modoEscaner == "moving") {
+      $scope.barra = document.getElementById('textbox_moveme').value;
       $rootScope.showload();
-      jQuery.post(app.rest+"ajax.mobile.data.php&a=pieza", { barra: $rootScope.barra }, function(data) {
+      jQuery.post(app.rest+"ajax.mobile.data.php&a=pieza", { barra: $scope.barra }, function(data) {
         $rootScope.hideload();
-        $rootScope.barra = "";
+
+        $scope.barra = "";
+        $rootScope.$apply();
+        
         if (data.error) {
           $rootScope.err(data.error);
           return;
         }
-
+        
         var found = 0;
-        for (var i = 0; i < $scope.inventory.length; i++) {
-          if ($scope.inventory[i].itemcode == data.ItemCode) {
+        for (var i = 0; i < $scope.packet.length; i++) {
+          if ($scope.packet[i].internalcode == data.internalcode) {
+            $rootScope.err("Pieza ya leida en esta gestión");
             found = 1;
-            $scope.inventory[i].qty += parseInt($rootScope.custom_qty);
             break;
           }
         }
 
+        if (found == 1) {
+          return;
+        }
+        
         if (found == 0) {
-          $scope.inventory.push({
-            itemcode: data.ItemCode,
-            itemname: data.ItemName,
-            qty: (isNaN($rootScope.custom_qty) ? 1 : parseInt($rootScope.custom_qty))
+          if (data.current_step != $scope.gol) {
+            $rootScope.err("Pieza no se encuentra en la etapa indicada. Se encuentra en "+data.stepName);
+            return;
+          }
+
+          $scope.packet.push({
+            internalcode: data.internalcode,
+            mark: data.mark,
+            dimtype: data.dimtype,
+            ok: true
           });
         } 
         
-        $rootScope.custom_qty=1;
+        
         $scope.$broadcast('scroll.resize');
         $rootScope.$apply();
         document.getElementById('textbox_moveme').focus();
 
-
-       
       },"json").fail(function(err) {
         $rootScope.hideload(); 
         $rootScope.barra = "";
@@ -641,40 +711,17 @@ angular.module('andes.controllers', [])
   });
 
   $scope.MOVER = function(gol) {
-
-      $rootScope.barra = document.getElementById('textbox_moveme').value;
-      $rootScope.showload();
-      jQuery.post(app.rest+"ajax.mobile.data.php&a=mover", { barra: $rootScope.barra, etapa: gol }, function(data) {
-        $rootScope.hideload();
-        $rootScope.barra = "";
-        if (data.error) {
-          $rootScope.err(data.error);
-          return;
-        }
-
-        $rootScope.ok("Listo");
-        $scope.$broadcast('scroll.resize');
-        $rootScope.$apply();
-        document.getElementById('textbox_moveme').focus();
-
-      },"json").fail(function(err) {
-        $rootScope.hideload(); 
-        $rootScope.barra = "";
-        $rootScope.$apply();
-        $rootScope.err(err.error);
-        document.getElementById('textbox_moveme').focus();
-      });
-
+      $scope.enableOp = true;
+      $scope.modoEscaner = "moving";
+      $scope.flowforward = true;
+      $scope.gol = gol;
   }
 
   $scope.modalSalida = null;
-  $scope.receptor = "";
-  $scope.bodega = "";
-  $scope.receptores = [];
-  $scope.bodegas = [];
+  $scope.ejecutor = "";
+  $scope.ejecutores = [];
 
-
-  $ionicModal.fromTemplateUrl('templates/finish_salida.html', {
+  $ionicModal.fromTemplateUrl('templates/finish_move.html', {
     scope: $scope,
     animation: 'slide-in-up'
   }).then(function(modal) {
@@ -683,40 +730,32 @@ angular.module('andes.controllers', [])
   $scope.closeSalida = function() {
     $scope.modalSalida.hide();
   }
-  $scope.finishConteo = function() {
-    if ($scope.inventory.length == 0) {
-      $rootScope.err("Salida vacia, revise nuevamente");
+  $scope.finishMover = function() {
+    if ($scope.packet.length == 0) {
+      $rootScope.err("movimiento vacio, revise nuevamente");
     }
     else {
-      $scope.receptor = "";
-      $scope.bodega = "";
-      $scope.receptores = [];
-      $scope.bodegas = [];
+      $scope.ejecutor = "";
+      $scope.ejecutores = [];
       $rootScope.showload();
       jQuery.get(app.rest+"ajax.mobile.data.php&a=employee", function(data) {
-        $scope.receptores = data;
-      },"json");
-      jQuery.get(app.rest+"ajax.mobile.data.php&a=whs", function(data) {
+        $scope.ejecutores = data;
         $rootScope.hideload();
         $scope.modalSalida.show();
-        $scope.bodegas = data;
       },"json");
-
-
     }
   }
-  $scope.confirmada = function() {
-    if ($scope.bodega == "") {
-      $rootScope.err("Indique bodega");
-      return;
-    }
 
-    if ($scope.receptor == "") {
-      $rootScope.err("Indique receptor de mercancias");
+  $scope.setejecutor = function(x) { $scope.ejecutor = x; }
+  $scope.confirmada = function() {
+    if ($scope.ejecutor == "") {
+      $rootScope.err("Indique ejecutor de tarea");
       return;
     }
     $rootScope.confirmar("Esta seguro?", function() {
       $rootScope.showload();
+      //$scope.gol = > current_step
+
     });
   };
   $scope.cancelarEntrega = function() {
@@ -775,6 +814,7 @@ angular.module('andes.controllers', [])
         else { 
           $rootScope.nombre = data.name;
           $rootScope.id = data.id;
+          localStorage.setItem('user', data.id);
           $scope.modalConfiguracion.hide();
         }
         $rootScope.$apply();       
@@ -789,12 +829,10 @@ angular.module('andes.controllers', [])
   });
   
   $scope.start = function(x) {
-    if (localStorage.getItem('user') == null) {
-      setTimeout(function() { 
-        $scope.scanner = "login";
-        $scope.modalConfiguracion.show();
-      },500);
-    } 
+    setTimeout(function() {
+      $scope.scanner = "login";
+      $scope.modalConfiguracion.show();
+    },500);
   }
   
   $scope.start();

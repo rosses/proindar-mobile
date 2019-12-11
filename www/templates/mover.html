@@ -1,28 +1,43 @@
 <ion-view view-title="MOVER PIEZAS">
   <ion-content scroll="false" class="home" on-swipe-right="onSwipeRight($event)" on-swipe-left="onSwipeLeft($event)">
-    <div ng-if="!enableOp">
-      <br><br><br>
-      <center>
-        <h3>Escanee un código de pieza para mover</h3>
-      </center>
+    <div ng-if="!enableOp" style="text-align:center;">
+         <br><br>
+         <center>
+          <h3>¿donde se encuentran actualmente?</h3>
+         </center>
+         <br /><br />
+         <button class="button button-royal button-default icon ion-qr-scanner" ng-click="MOVER('1')"> CORTE</button>
+         <br /><br />
+         <button class="button button-royal button-default icon ion-qr-scanner" ng-click="MOVER('2')"> ARMADO</button>
+         <br /><br />
+         <button class="button button-royal button-default icon ion-qr-scanner" ng-click="MOVER('3')"> LIMPIEZA</button>
+         <br /><br />
+         <button class="button button-royal button-default icon ion-qr-scanner" ng-click="MOVER('4')"> CALIDAD</button>
+         <br /><br />
+         <button class="button button-royal button-default icon ion-qr-scanner" ng-click="MOVER('5')"> GALVANIZADO</button>
+
     </div>
 
     <div ng-hide="!enableOp">
-
-      <!--<button style="margin-top:-6px;" class="button button-picking button-positive icon ion-plus-circled" ng-click="agregarEmparejado();"> Agregar Emparejado</button>   -->
-      <!--<button style="margin-top:-6px;" class="button button-picking button-assertive icon ion-share" ng-click="cancelar();"> CANCELAR</button>   -->
       <input type="text" ng-model="barra" id="textbox_moveme" readonly="readonly" placeholder="escanea un codigo de pieza..." style="background-color: rgb(251, 255, 189);  font-size: 20px; width:100%; border: 2px solid black; padding: 10px;" />
-      <br />
-      <hr />
-      <ion-scroll direction="y" style="height: calc(100vh - 250px)">
-         
-         <button class="button button-royal button-default icon ion-qr-scanner" ng-click="MOVER(1)"> CORTE</button>
-         <button class="button button-royal button-default icon ion-qr-scanner" ng-click="MOVER(2)"> ARMADO</button>
-         <button class="button button-royal button-default icon ion-qr-scanner" ng-click="MOVER(3)"> LIMPIEZA</button>
-         <button class="button button-royal button-default icon ion-qr-scanner" ng-click="MOVER(4)"> CALIDAD</button>
-         <button class="button button-royal button-default icon ion-qr-scanner" ng-click="MOVER(5)"> GALVANIZADO</button>
-          
-         
+      <h4>Etapa:</h4>
+      <div class="row">
+        <div class="col-33"><h4 style="line-height:8px;" ng-style="!flowforward && {'color':'black'} || {'color': '#DEDEDE'}">Retroceder</h4></div>
+        <div class="col-33 text-center">
+          <label class="toggle">
+             <input type="checkbox" ng-model="flowforward">
+             <div class="track">
+               <div class="handle"></div>
+             </div>
+          </label>
+        </div>
+        <div class="col-33"><h4 style="line-height:8px;" ng-style="flowforward && {'color':'black'} || {'color': '#DEDEDE'}">Avanzar</h4></div>
+      </div>
+      <ion-scroll direction="y" style="border:1px solid #DEDEDE;height: calc(100vh - 340px)">
+        <h5 style='color:red; text-align:center;' ng-if="packet.length == 0">NO HAY PIEZAS<br />PARA GESTIONAR<br /><br />Empieza a leer las piezas para agregar a esta gestión</h5>
+        <div class="row" style="margin-top:12px;margin-bottom:12px;" ng-repeat="piece in packet">
+          <div class="col"><b>Marca: {{piece.mark}}</b><br />Cod.: {{piece.internalcode}} | {{piece.dimtype}}</div>
+        </div>
       </ion-scroll>
     </div>
 
@@ -31,6 +46,7 @@
     <div class="row">
       <div class="col col-100 text-center" style="margin-top: -10px;">
         <button class="button button-dark" ng-click="cancelarEntrega()">CANCELAR</button> 
+        <button class="button button-assertive button-small" ng-if="packet.length > 0" ng-click="finishMover()">ASIGNAR</button> 
       </div>
     </div>
     

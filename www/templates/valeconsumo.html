@@ -1,28 +1,46 @@
 <ion-view view-title="VALE DE CONSUMO">
   <ion-content scroll="false" class="home" on-swipe-right="onSwipeRight($event)" on-swipe-left="onSwipeLeft($event)">
+    <input ng-hide="enableOp" type="text" ng-model="barra" id="textbox_consumo" readonly="readonly" placeholder="escanea un vale de consumo..." class="focusme" />
     <div ng-if="!enableOp">
       <br><br><br>
       <center>
-        <h3>Escanee un código de vale de consumo para comenzar</h3>
+        <h3>Escanee un vale de consumo para comenzar</h3>
       </center>
     </div>
 
-    <div ng-hide="!enableOp">
-
-      <!--<button style="margin-top:-6px;" class="button button-picking button-positive icon ion-plus-circled" ng-click="agregarEmparejado();"> Agregar Emparejado</button>   -->
-      <!--<button style="margin-top:-6px;" class="button button-picking button-assertive icon ion-share" ng-click="cancelar();"> CANCELAR</button>   -->
-      <input type="text" ng-model="barra" id="textbox_consumo" readonly="readonly" placeholder="escanea un vale de consumo..." style="background-color: rgb(251, 255, 189);  font-size: 20px; border: 2px solid black; width: 100%; padding: 10px;" />
-      <br />
-      <ion-scroll direction="y" style="height: calc(100vh - 250px)">
+    <div ng-hide="!enableOp"> 
+      <div class="header">
+        <div style='font-size:18px; font-weight:bold; text-align: center;'>{{vale.barcode}}</div><br />
+        <b>Asignación original:</b><br />
+        {{vale.assigned_str}}
+      </div>
+      <ion-scroll direction="y" style="height: calc(100vh - 250px);border: 1px solid #EDEDED;">
          
-        <h5 style='color:red; text-align:center;' ng-if="inventory.length == 0">NO HAY PRODUCTOS<br />EN ESTE VALE DE CONSUMO<br /></h5>
-        <div class="" style="display:inline-block; margin-right: 20px; font-size: 25px; margin-bottom: 10px;" ng-repeat="linea in inventory">
-          <div class="row">
-            <div class="col-67 conteo-articulo">
-              <button ng-click="borrar(linea.itemcode)" style="height: 20px; line-height: 20px; min-width: 20px; width: 20px; min-height: 20px; text-align: center; padding: 0px;" class="button button-assertive">X</button> <span>{{linea.itemcode}}</span> {{linea.itemname}}
+        <h5 style='color:red; text-align:center;' ng-if="vale.items.length == 0">NO HAY PRODUCTOS<br />EN ESTE VALE DE CONSUMO<br /></h5>
+
+        <div class="tablitla" style="width:100%; margin-right: 20px; margin-bottom: 10px;" ng-repeat="linea in vale.items">
+          <div class="row" ng-if="$index == 0">
+            <div class="col-33">
+              <b>Artículo</b>
             </div>
-            <div class="col-33 conteo-qty">
-              {{linea.qty}}
+            <div class="col-33 text-center">
+              <b>Pendientes</b>
+            </div>
+            <div class="col-33 text-center">
+              <b>Entrega</b>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-33">
+              <b>{{linea.itemcode}}</b><br />{{linea.description}}
+            </div>
+            <div class="col-33 text-center">
+              <b>{{formatQty(linea.pending)}}</b>
+            </div>
+            <div class="col-33 text-center">
+              <a ng-click="moveParcial($index,-1)" class="button button-assertive btn-single-left">-</a>
+              <b>{{formatQty(linea.parcial)}}</b>
+              <a ng-click="moveParcial($index,1)" class="button button-success btn-single-right">+</a>
             </div>
           </div>
           
@@ -34,8 +52,8 @@
   <ion-footer-bar class="bar-stable">
     <div class="row">
       <div class="col col-100 text-center" style="margin-top: -10px;">
-        <button class="button button-dark" ng-click="cancelarEntrega()">CANCELAR</button>
-        <button class="button button-assertive button-small" ng-if="enableOp" ng-click="finishConteo()">ENVIAR A SAP</button>
+        <button class="button button-dark" ng-click="cancelarValeConsumo()">CANCELAR</button>
+        <button class="button button-assertive button-small" ng-if="enableOp && vale.items.length > 0" ng-click="finishValeconsumo()">ENVIAR A SAP</button>
       </div>
     </div>
     

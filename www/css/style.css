@@ -352,3 +352,46 @@ ion-content.pedido {
 .modallle label {
 	text-align:left;
 }
+
+.focusme {
+	font-size: 20px !important; 
+	border: 2px solid black !important; 
+	padding: 10px !important; 
+	width:100% !important;
+}
+.focusme:focus, .custom_qty:focus {
+	background-color: rgb(251, 255, 189) !important;  
+}
+.tablitla .row {
+	padding-top: 20px;
+	padding-bottom: 15px;
+	border-bottom: 1px solid #EDEDED;
+}
+.tablitla .row .col-33 {
+	font-size: 15px;
+}
+.header {
+	background-color:#c3e1ff;
+	padding:10px;
+}
+.button-success {
+	background-color:#6be06b;
+}
+.btn-single-left {
+	padding: 0 !important;
+    /* width: 0px; */
+    /* height: 0px; */
+    min-width: 20px;
+    min-height: 20px;
+    line-height: 20px;
+    margin-right: 20px;
+}
+.btn-single-right {
+	padding: 0 !important;
+    /* width: 0px; */
+    /* height: 0px; */
+    min-width: 20px;
+    min-height: 20px;
+    line-height: 20px;
+    margin-left: 20px;
+}

@@ -1,6 +1,7 @@
 <ion-view view-title="ARMADO DE LOTES">
   <ion-content scroll="false" class="home" on-swipe-right="onSwipeRight($event)" on-swipe-left="onSwipeLeft($event)">
-    <div ng-if="!enableOp">
+    <div ng-hide="enableOp">
+      <input type="text" ng-model="barra" id="textbox_ott" readonly="readonly" placeholder="escanea un codigo de OT..." class="focusme" />
       <br><br><br>
       <center>
         <h3>Escanee un código de OT para comenzar</h3>
@@ -8,23 +9,22 @@
     </div>
 
     <div ng-hide="!enableOp">
+      <input type="text" ng-model="pieza" id="textbox_box" readonly="readonly" placeholder="escanea un codigo de pieza..." class="focusme" />
+      <div class="header">
+        <div style='font-size:18px; font-weight:bold;'>OT {{ot.prj_code_sap}}</div>
+        <b>{{ot.cardname}}</b><br />
+        <i>{{ot.unPacket.length}} piezas no loteadas</i>
+      </div>
 
-      <!--<button style="margin-top:-6px;" class="button button-picking button-positive icon ion-plus-circled" ng-click="agregarEmparejado();"> Agregar Emparejado</button>   -->
-      <!--<button style="margin-top:-6px;" class="button button-picking button-assertive icon ion-share" ng-click="cancelar();"> CANCELAR</button>   -->
-      <input type="text" ng-model="barra" id="textbox_ott" readonly="readonly" placeholder="escanea un codigo de OT..." style="background-color: rgb(251, 255, 189);  font-size: 20px; width:100%; border: 2px solid black; padding: 10px;" />
-      <br />
-      <hr />
       <ion-scroll direction="y" style="height: calc(100vh - 250px)">
          
-        <h5 style='color:red; text-align:center;' ng-if="inventory.length == 0">NO HAY PIEZAS<br />EN ESTE LOTE<br /><br />Empieza a leer las piezas para agregar a este lote</h5>
-        <div class="" style="display:inline-block; margin-right: 20px; font-size: 25px; margin-bottom: 10px;" ng-repeat="linea in inventory">
+        <h5 style='color:red; text-align:center;' ng-if="packet.length == 0">NO HAY PIEZAS<br />EN ESTE LOTE<br /><br />Empieza a leer las piezas para agregar a este lote</h5>
+        <br /> 
+        <div class="" style="display:inline-block; width:100%; margin-right: 20px; font-size: 25px; margin-bottom: 10px;" ng-repeat="linea in packet">
           <div class="row">
-            <div class="col-67 conteo-articulo">
-              <button ng-click="borrar(linea.itemcode)" style="height: 20px; line-height: 20px; min-width: 20px; width: 20px; min-height: 20px; text-align: center; padding: 0px;" class="button button-assertive">X</button> <span>{{linea.itemcode}}</span> {{linea.itemname}}
-            </div>
-            <div class="col-33 conteo-qty">
-              {{linea.qty}}
-            </div>
+            <div class="col-100 conteo-articulo" style="width:100%;">
+              <button ng-click="borrar(linea.internalcode)" style="height: 20px; line-height: 20px; min-width: 20px; width: 20px; min-height: 20px; text-align: center; padding: 0px;" class="button button-assertive">X</button> <span>{{linea.internalcode}}</span><br /><i>Marca: <b>{{linea.mark}}</b><br />{{linea.kg}} kgs - {{linea.dimtype}}</i>
+            </div> 
           </div>
           
         </div> 
@@ -35,8 +35,8 @@
   <ion-footer-bar class="bar-stable">
     <div class="row">
       <div class="col col-100 text-center" style="margin-top: -10px;">
-        <button class="button button-dark" ng-click="cancelarEntrega()">CANCELAR</button>
-        <button class="button button-assertive button-small" ng-if="enableOp" ng-click="finishConteo()">ENVIAR A SAP</button>
+        <button class="button button-dark" ng-click="cancelarLote()">CANCELAR</button>
+        <button class="button button-assertive button-small" ng-if="enableOp && packet.length > 0" ng-click="finishLote()">CREAR LOTE</button>
       </div>
     </div>
     
