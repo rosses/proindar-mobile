@@ -20,9 +20,9 @@ angular.module('andes', ['ionic', 'andes.controllers','ngStorage','peanuthub-cus
     if (window.cordova) {
       console.log('Registered PROINDAR Mobile')
       window.plugins.intent.setNewIntentHandler(function (Intent) {
-          console.log("SCANNER INPUT",Intent);
-          if (Intent.scanner) {
-            $rootScope.$broadcast("scanner", { barcode: Intent.barcode });
+          console.log("SCANNER INPUT", Intent);
+          if (typeof Intent == "string") {
+            $rootScope.$broadcast("scanner", { barcode: Intent });
             $rootScope.$apply();
           }
       });
