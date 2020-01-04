@@ -19,19 +19,14 @@ angular.module('andes', ['ionic', 'andes.controllers','ngStorage','peanuthub-cus
     }
     if (window.cordova) {
       console.log('Registered PROINDAR Mobile')
-      window.plugins.intent.setNewIntentHandler(function (Intent) {
-          console.log("SCANNER INPUT", Intent);
-          if (typeof Intent == "string") {
-            $rootScope.$broadcast("scanner", { barcode: Intent });
-            $rootScope.$apply();
-          }
-      });
+      $rootScope.registerProindarScanner();
     }
     if (window.StatusBar) {
       // org.apache.cordova.statusbar required
       StatusBar.styleDefault();
     }
   });
+
 
   $rootScope.custom_qty = "1";
   $rootScope.calculator = function() {
@@ -51,7 +46,16 @@ angular.module('andes', ['ionic', 'andes.controllers','ngStorage','peanuthub-cus
  
   $state.go("main.selector");
  
-
+  $rootScope.registerProindarScanner = function() {
+      window.plugins.intent.setNewIntentHandler(function (Intent) {
+          console.log("SCANNER INPUT", Intent);
+          if (typeof Intent == "string") {
+            $rootScope.$broadcast("scanner", { barcode: Intent });
+            $rootScope.$apply();
+            $rootScope.registerProindarScanner();
+          }
+      });
+  };
   $rootScope.err = function(msg, cb) {
      var alertPopup = $ionicPopup.alert({
        title: 'Error',
