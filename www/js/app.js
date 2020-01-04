@@ -13,13 +13,8 @@ angular.module('andes', ['ionic', 'andes.controllers','ngStorage','peanuthub-cus
     $rootScope.id = "";
     $rootScope.nombre = "";
     $rootScope.usercode = "";
-
     if (!window.cordova) {
       $rootScope.usercode = ""; /* for demo porposes */
-    }
-    if (window.cordova && window.cordova.plugins.Keyboard) {
-      cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
-      cordova.plugins.Keyboard.disableScroll(true);
     }
     if (window.StatusBar) {
       // org.apache.cordova.statusbar required
