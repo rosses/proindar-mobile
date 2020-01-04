@@ -56,6 +56,14 @@
         <splash density="port-xhdpi" src="resources/android/splash/drawable-port-xhdpi-screen.png" />
         <splash density="port-xxhdpi" src="resources/android/splash/drawable-port-xxhdpi-screen.png" />
         <splash density="port-xxxhdpi" src="resources/android/splash/drawable-port-xxxhdpi-screen.png" />
+        <config-file parent="application" target="AndroidManifest.xml">
+            <activity android:label="webIntentFilter" android:name="cl.proindar.mobile">
+                <intent-filter android:autoVerify="true">
+                    <action android:name="android.intent.ACTION_DECODE_DATA" />
+                    <category android:name="android.intent.category.DEFAULT" /> 
+                </intent-filter>
+            </activity>
+        </config-file>
     </platform>
     <platform name="ios">
         <allow-intent href="itms:*" />
