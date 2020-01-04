@@ -1,24 +1,16 @@
-<ion-view view-title="ARMADO DE LOTES">
+<ion-view view-title="TERMINO CORTE Y LOTEO">
   <ion-content scroll="false" class="home" on-swipe-right="onSwipeRight($event)" on-swipe-left="onSwipeLeft($event)">
-    <div ng-hide="enableOp">
-      <input type="text" ng-model="barra" id="textbox_ott" readonly="readonly" placeholder="escanea un codigo de OT..." class="focusme" />
-      <br><br><br>
-      <center>
-        <h3>Escanee un código de OT para comenzar</h3>
-      </center>
-    </div>
-
-    <div ng-hide="!enableOp">
-      <input type="text" ng-model="pieza" id="textbox_box" readonly="readonly" placeholder="escanea un codigo de pieza..." class="focusme" />
-      <div class="header">
-        <div style='font-size:18px; font-weight:bold;'>OT {{ot.prj_code_sap}}</div>
-        <b>{{ot.cardname}}</b><br />
+    <div>
+      <input type="text" ng-model="barra" id="pieza_lote_entrada" readonly="readonly" placeholder="escanea un codigo de pieza..." class="focusme" />
+      <div class="header" ng-if="packet.length > 0">
+        <div style='font-size:18px; font-weight:bold;'>OT {{packet[0].OT}}</div>
+        <b>{{packet[0].cardname}}</b><br />
         <i>{{ot.unPacket.length}} piezas no loteadas</i>
       </div>
 
       <ion-scroll direction="y" style="height: calc(100vh - 250px)">
          
-        <h5 style='color:red; text-align:center;' ng-if="packet.length == 0">NO HAY PIEZAS<br />EN ESTE LOTE<br /><br />Empieza a leer las piezas para agregar a este lote</h5>
+        <h5 style='color:red; text-align:center;' ng-if="packet.length == 0">NO HAY PIEZAS<br />EN ESTE LOTE<br /><br />Empieza a leer las piezas<br /> para agregar a este lote</h5>
         <br /> 
         <div class="" style="display:inline-block; width:100%; margin-right: 20px; font-size: 25px; margin-bottom: 10px;" ng-repeat="linea in packet">
           <div class="row">
@@ -36,7 +28,7 @@
     <div class="row">
       <div class="col col-100 text-center" style="margin-top: -10px;">
         <button class="button button-dark" ng-click="cancelarLote()">CANCELAR</button>
-        <button class="button button-assertive button-small" ng-if="enableOp && packet.length > 0" ng-click="finishLote()">CREAR LOTE</button>
+        <button class="button button-assertive button-small" ng-if="packet.length > 0" ng-click="finishLote()">CREAR LOTE</button>
       </div>
     </div>
     

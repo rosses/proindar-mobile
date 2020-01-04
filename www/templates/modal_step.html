@@ -1,0 +1,20 @@
+<ion-modal-view>
+<ion-header-bar class="bar-assertive">
+  <h1 class="title">ETAPA A OPERAR</h1>
+</ion-header-bar>
+<ion-content style="padding:15px; text-align:center;" class="modallle">
+
+<ion-list>
+  <ion-radio style="font-size:13px;" ng-click="setStep(r.id)" ng-model="etapaxx" ng-value="r.id" ng-repeat="r in etapas">{{r.name}}</ion-radio>
+</ion-list>
+
+</ion-content>
+<ion-footer-bar class="bar-stable">
+<div class="row">
+  <div class="col col-100 text-center" style="margin-top: -10px;">
+    <button class="button button-assertive button-small" ng-click="etapaOK()">OK</button>
+  </div>
+</div>
+
+</ion-footer-bar>
+</ion-modal-view>

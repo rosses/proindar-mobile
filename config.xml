@@ -32,6 +32,7 @@
     <plugin name="cordova-plugin-dialogs" />
     <plugin name="cordova-plugin-camera" />
     <plugin name="cordova-plugin-media-capture" />
+    <plugin name="cordova-plugin-broadcaster" />
     <preference name="exit-on-suspend" value="false" />
     <preference name="android-windowSoftInputMode" value="stateHidden|adjustResize" />
     <allow-intent href="http://*/*" />

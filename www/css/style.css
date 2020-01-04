@@ -395,3 +395,32 @@ ion-content.pedido {
     line-height: 20px;
     margin-left: 20px;
 }
+
+
+ul.the_i_segment[proindar] li:first-child {
+  border-color: #ef473a;
+  color: #ef473a;
+}
+ul.the_i_segment[proindar] li:first-child.active {
+  background-color: #ef473a;
+  color: #fff;
+}
+
+ul.the_i_segment[proindar] li:nth-child(2) {
+  border-color: #808080;
+  color: #808080;
+}
+ul.the_i_segment[proindar] li:nth-child(2).active {
+  background-color: #808080;
+  color: #fff;
+}
+
+
+ul.the_i_segment[proindar] li:last-child {
+  border-color: #28a54c;
+  color: #28a54c;
+}
+ul.the_i_segment[proindar] li:last-child.active {
+  background-color: #28a54c;
+  color: #fff;
+}

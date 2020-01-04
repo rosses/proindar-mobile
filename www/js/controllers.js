@@ -1,7 +1,7 @@
 //
 angular.module('andes.controllers', [])
 .controller('EntregaCtrl', function($scope, $state, $rootScope, $localStorage, $ionicModal, $http, $location, $timeout, $ionicLoading, $ionicPopup, $ionicHistory, $stateParams, $ionicPlatform) {
-  $rootScope.enInicio = 0;
+
   var deregisterFirst = $ionicPlatform.registerBackButtonAction(
     function() {
       $ionicHistory.nextViewOptions({
@@ -24,7 +24,7 @@ angular.module('andes.controllers', [])
   $scope.grupo = localStorage.getItem('ocip');
 
   $scope.$on('$ionicView.enter', function(obj, viewData){
-    if (window.cordova) { window.cordova.plugins.honeywell.enableTrigger(() => console.info('trigger enabled')); }
+    
     if (viewData.direction == 'back') {
       $scope.popCloseable = null;
       $rootScope.barra = '';
@@ -194,7 +194,7 @@ angular.module('andes.controllers', [])
   document.getElementById('textbox_barra').focus();
 })
 .controller('ValeCtrl', function($scope, $state, $rootScope, $localStorage, $ionicModal, $http, $location, $timeout, $ionicLoading, $ionicPopup, $ionicHistory, $stateParams, $ionicPlatform) {
-  $rootScope.enInicio = 0;
+
   var deregisterFirst = $ionicPlatform.registerBackButtonAction(
     function() {
       $ionicHistory.nextViewOptions({
@@ -217,7 +217,7 @@ angular.module('andes.controllers', [])
   $scope.grupo = localStorage.getItem('ocip');
 
   $scope.$on('$ionicView.enter', function(obj, viewData){
-    if (window.cordova) { window.cordova.plugins.honeywell.enableTrigger(() => console.info('trigger enabled')); }
+    
     if (viewData.direction == 'back') {
       $scope.popCloseable = null;
       $rootScope.barra = '';
@@ -393,19 +393,7 @@ angular.module('andes.controllers', [])
   }
   document.getElementById('textbox_consumo').focus();
 })
-.controller('MakeloteCtrl', function($scope, $state, $rootScope, $localStorage, $ionicModal, $http, $location, $timeout, $ionicLoading, $ionicPopup, $ionicHistory, $stateParams, $ionicPlatform) {
-  $rootScope.enInicio = 0;
-  var deregisterFirst = $ionicPlatform.registerBackButtonAction(
-    function() {
-      $ionicHistory.nextViewOptions({
-          historyRoot: true
-      });
-      $state.go('main.selector');
-    }, 100
-  );
-  $scope.$on('$destroy', deregisterFirst);
-
-  $scope.warehouse = $stateParams.warehouse;
+.controller('ReceiveotCtrl', function($scope, $state, $rootScope, $localStorage, $ionicModal, $http, $location, $timeout, $ionicLoading, $ionicPopup, $ionicHistory, $stateParams, $ionicPlatform) {
   $scope.popCloseable = null;
   $scope.barra = '';
   $scope.pieza = '';
@@ -417,7 +405,6 @@ angular.module('andes.controllers', [])
   $scope.grupo = localStorage.getItem('ocip');
 
   $scope.$on('$ionicView.enter', function(obj, viewData){
-    if (window.cordova) { window.cordova.plugins.honeywell.enableTrigger(() => console.info('trigger enabled')); }
     if (viewData.direction == 'back') {
       $scope.popCloseable = null;
       $scope.barra = '';
@@ -438,15 +425,186 @@ angular.module('andes.controllers', [])
     $scope.enableOp = false;
     $scope.ot = null;
   }); 
+  $scope.recibirTodo = function() {
+    $rootScope.confirmar('Confirmar la recepción de '+$scope.ot.unReceived.length+' piezas?', function() {      
+      var sender = [];
+      for (var i = 0; i < $scope.ot.unReceived.length; i++) {
+        sender.push({
+          internalcode: $scope.ot.unReceived[i].internalcode
+        });
+      }
+      $rootScope.showload();
+      jQuery.post(app.rest+"ajax.mobile.data.php&a=pm_all", { 
+        ot: $scope.ot.id, 
+        autor: localStorage.getItem('user') 
+      }, function(data) {
+        $rootScope.hideload();
+        if (data.error) { 
+          $rootScope.err(data.error); 
+          return; 
+        }
+        $rootScope.ok(data.msg);
+        $scope.ot = null;
+        $scope.enableOp = false;
+        $scope.packet = [];
+        $scope.modoEscaner = "leer";
+        $scope.$broadcast('scroll.resize');
+        $rootScope.$apply();
+        document.getElementById('textbox_ot1').value="";
+        document.getElementById('textbox_ot1').focus();
+      },"json");
 
-  $scope.cancelar = function() {
-    $scope.popCloseable = null;
+    });
+  };
+
+  $scope.borrar = function (internalcode) {
+    $rootScope.confirmar('Quitar?', function() {
+      for (var i = 0; i < $scope.packet.length; i++) {
+        if ($scope.packet[i].internalcode == internalcode) {
+          $scope.packet.splice(i,1);
+          break;
+        }
+      }
+    });
+  };
+  $scope.$on('scanner', function(event, args) {
+    if ($scope.modoEscaner == "leer") {
+      $scope.barra = document.getElementById('textbox_ot1').value;
+      $rootScope.showload();
+      jQuery.post(app.rest+"ajax.mobile.data.php&a=ot", { barra: $scope.barra }, function(data) {
+        $rootScope.hideload();
+        document.getElementById('textbox_ot1').value = "";
+        if (data.error) { 
+          $rootScope.err(data.error); 
+          return; 
+        }
+        if (data.unReceived.length == 0) { 
+          $rootScope.err("No hay piezas pendientes para recibir en la OT indicada"); 
+          return;
+        }
+        $scope.ot = data;
+        $scope.enableOp = true;
+        $scope.packet = [];
+        $scope.modoEscaner = "lotear";
+        $scope.$broadcast('scroll.resize');
+        $rootScope.$apply(); 
+        document.getElementById('textbox_ot1').focus();
+      },"json");;
+    }
+    else if ($scope.modoEscaner == "lotear") {
+      $scope.pieza = document.getElementById('textbox_bo1').value;
+      $rootScope.showload();
+      jQuery.post(app.rest+"ajax.mobile.data.php&a=pieza&to=packet", { barra: $scope.pieza }, function(data) {
+        $rootScope.hideload();
+        document.getElementById('textbox_bo1').value = "";
+        $scope.pieza = "";
+        $rootScope.$apply();
+        if (data.error) {
+          $rootScope.err(data.error);
+          return;
+        }
+        var add = 1;
+        for (var i = 0; i < $scope.packet.length; i++) {
+          if ($scope.packet[i].internalcode == data.internalcode) {
+            $rootScope.err("Pieza ya existe");
+            add = 0;
+            break;
+          }
+        }
+        if (add==1) {
+          $scope.packet.push({
+            mark: data.mark,
+            dimtype: data.dimtype,
+            kg: parseFloat(data.totalkg),
+            internalcode: data.internalcode
+          });
+        }
+        $scope.$broadcast('scroll.resize');
+        $rootScope.$apply();
+        document.getElementById('textbox_bo1').focus();
+      },"json");
+
+    } 
+  });
+  $scope.confirmarRecibir = function() {
+    if ($scope.packet.length == 0) {
+      $rootScope.err("No esta recibiendo nada");
+    }
+    else {
+      $rootScope.confirmar("Desea confirmar la recepción para P.M?", function() {
+        $rootScope.showload();
+        jQuery.post(app.rest+"ajax.mobile.data.php&a=pm", { 
+          ot: $scope.ot.id,
+          items: $scope.packet,
+          autor: localStorage.getItem('user')
+        }, function(data) {
+          $rootScope.hideload();
+          if (data.error) {
+            $rootScope.err(data.error);
+            return;
+          }
+          $rootScope.ok(data.msg);
+          $scope.ot = null;
+          $scope.enableOp = false;
+          $scope.packet = [];
+          $scope.modoEscaner = "leer";
+          $scope.$broadcast('scroll.resize');
+          $rootScope.$apply();
+          document.getElementById('textbox_ot1').value="";
+          document.getElementById('textbox_ot1').focus();
+        },"json");
+      });
+    }
+  }
+
+  $scope.cancelarRecibir = function() {
+    $rootScope.confirmar("Volver al inicio?", function() {
+      $ionicHistory.nextViewOptions({
+          historyRoot: true
+      });
+      $state.go('main.selector');
+    }, function() {
+    });
+  }
+  document.getElementById('textbox_ot1').focus();
+})
+.controller('MakeloteentradaCtrl', function($scope, $state, $rootScope, $localStorage, $ionicModal, $http, $location, $timeout, $ionicLoading, $ionicPopup, $ionicHistory, $stateParams, $ionicPlatform) {
+
+  var deregisterFirst = $ionicPlatform.registerBackButtonAction(
+    function() {
+      $ionicHistory.nextViewOptions({
+          historyRoot: true
+      });
+      $state.go('main.selector');
+    }, 100
+  );
+  $scope.$on('$destroy', deregisterFirst);
+ 
+  $scope.barra = ''; 
+  $scope.packet = [];
+  $scope.modoEscaner = 'leer';
+
+  $scope.grupo = localStorage.getItem('ocip');
+
+  $scope.$on('$ionicView.enter', function(obj, viewData){
+    
+    if (viewData.direction == 'back') {
+      $scope.barra = '';
+      $scope.packet = [];
+      $scope.modoEscaner = 'leer';
+    }
+  });
+
+  $scope.$on('$ionicView.beforeLeave', function(obj, viewData){
     $scope.barra = '';
-    $scope.pieza = '';
     $scope.packet = [];
     $scope.modoEscaner = 'leer';
-    $scope.enableOp = false;
-    $scope.ot = null;
+  }); 
+
+  $scope.cancelar = function() {
+    $scope.barra = '';
+    $scope.packet = [];
+    $scope.modoEscaner = 'leer';
   }
   $scope.borrar = function (internalcode) {
     $rootScope.confirmar('Quitar pieza?', function() {
@@ -461,45 +619,22 @@ angular.module('andes.controllers', [])
 
   $scope.$on('scanner', function(event, args) {
     if ($scope.modoEscaner == "leer") {
-      $scope.barra = document.getElementById('textbox_ott').value;
+
+      $scope.pieza = document.getElementById('pieza_lote_entrada').value;
       $rootScope.showload();
-      jQuery.post(app.rest+"ajax.mobile.data.php&a=ot", { barra: $scope.barra }, function(data) {
-        $rootScope.hideload();
-        if (data.error) {
-          $rootScope.err(data.error);
-          return;
-        }
-        $scope.ot = data;
-        $scope.enableOp = true;
-        $scope.packet = [];
-        $scope.modoEscaner = "lotear";
-        $scope.$broadcast('scroll.resize');
-        $rootScope.$apply();
-        document.getElementById('textbox_box').focus();
-
-
-       
-      },"json").fail(function(err) {
-        $rootScope.hideload(); 
-        $rootScope.$apply();
-        $rootScope.err(err.error);
-        document.getElementById('textbox_ott').focus();
-      });
-
-    }
-    else if ($scope.modoEscaner == "lotear") {
-
-      $scope.pieza = document.getElementById('textbox_box').value;
-      $rootScope.showload();
-      jQuery.post(app.rest+"ajax.mobile.data.php&a=pieza&to=packet", { barra: $scope.pieza }, function(data) {
+      jQuery.post(app.rest+"ajax.mobile.data.php&a=pieza&to=lote", { barra: $scope.pieza }, function(data) {
         $rootScope.hideload();
         $scope.pieza = "";
+        document.getElementById('pieza_lote_entrada').value = "";
         $rootScope.$apply();
         if (data.error) {
           $rootScope.err(data.error);
           return;
         }
-
+        if ($scope.packet.length > 0 && $scope.packet[0].OT!=data.OT) {
+          $rootScope.err("Pieza no corresponde a OT en trabajo");
+          return;
+        }
         var add = 1;
         for (var i = 0; i < $scope.packet.length; i++) {
           if ($scope.packet[i].internalcode == data.internalcode) {
@@ -514,23 +649,19 @@ angular.module('andes.controllers', [])
             mark: data.mark,
             dimtype: data.dimtype,
             kg: parseFloat(data.totalkg),
-            internalcode: data.internalcode
+            internalcode: data.internalcode,
+            cardname: data.cardname,
+            OT: data.OT,
+            totalkg: parseFloat(data.totalkg),
+            ot_id: data.ot_id
           });
         }
 
         $scope.$broadcast('scroll.resize');
         $rootScope.$apply();
-        document.getElementById('textbox_box').focus();
-
-
+        document.getElementById('pieza_lote_entrada').focus();
        
-      },"json").fail(function(err) {
-        $rootScope.hideload(); 
-        $scope.pieza = "";
-        $rootScope.$apply();
-        $rootScope.err(err.error);
-        document.getElementById('textbox_box').focus();
-      });
+      },"json");
 
     } 
 
@@ -546,7 +677,7 @@ angular.module('andes.controllers', [])
       $rootScope.confirmar("Se generará un lote y se moveran las piezas a la próxima etapa. Desea continuar?", function() {
         $rootScope.showload();
         jQuery.post(app.rest+"ajax.mobile.data.php&a=crearLote", { 
-          ot: $scope.ot.id,
+          ot: $scope.packet[0].ot_id,
           packet: $scope.packet,
           autor: localStorage.getItem('user')
         }, function(data) {
@@ -568,7 +699,7 @@ angular.module('andes.controllers', [])
 
           $scope.$broadcast('scroll.resize');
           $rootScope.$apply();
-          document.getElementById('textbox_ott').focus();
+          document.getElementById('pieza_lote_entrada').focus();
           
         },"json");
       });
@@ -589,7 +720,7 @@ angular.module('andes.controllers', [])
     });
   };
   $scope.cancelarLote = function() {
-    $rootScope.confirmar("Anular armado del lote?", function() {
+    $rootScope.confirmar("Anular cierre de corte y armado del lote?", function() {
       $ionicHistory.nextViewOptions({
           historyRoot: true
       });
@@ -598,10 +729,10 @@ angular.module('andes.controllers', [])
     });
 
   }
-  document.getElementById('textbox_ott').focus();
+  document.getElementById('pieza_lote_entrada').focus();
 })
 .controller('MoverCtrl', function($scope, $state, $rootScope, $localStorage, $ionicModal, $http, $location, $timeout, $ionicLoading, $ionicPopup, $ionicHistory, $stateParams, $ionicPlatform) {
-  $rootScope.enInicio = 0;
+
   var deregisterFirst = $ionicPlatform.registerBackButtonAction(
     function() {
       $ionicHistory.nextViewOptions({
@@ -617,9 +748,10 @@ angular.module('andes.controllers', [])
   $scope.enableOp = false;
   $scope.packet = [];
   $scope.ejecutor = "";
+ 
 
   $scope.$on('$ionicView.enter', function(obj, viewData){
-    if (window.cordova) { window.cordova.plugins.honeywell.enableTrigger(() => console.info('trigger enabled')); }
+    
     if (viewData.direction == 'back') {
       $scope.popCloseable = null;
       $scope.barra = '';
@@ -647,15 +779,20 @@ angular.module('andes.controllers', [])
     $scope.packet = [];
     $scope.ejecutor = "";
   }
-  $scope.borrar = function (IdArticulo) {
-
+  $scope.borrar = function (IdPieza) {
+    for (var i = 0; i < $scope.packet.length; i++) {
+      if ($scope.packet[i].internalcode == IdPieza) {
+        $scope.packet.splice(i, 1);
+        break;
+      }
+    }
   };
 
   $scope.$on('scanner', function(event, args) {
-    if ($scope.modoEscaner == "moving") {
+    if ($scope.modoEscaner == "leer") {
       $scope.barra = document.getElementById('textbox_moveme').value;
       $rootScope.showload();
-      jQuery.post(app.rest+"ajax.mobile.data.php&a=pieza", { barra: $scope.barra }, function(data) {
+      jQuery.post(app.rest+"ajax.mobile.data.php&a=moving", { barra: $scope.barra, autor: localStorage.getItem('user') }, function(data) {
         $rootScope.hideload();
 
         $scope.barra = "";
@@ -669,7 +806,7 @@ angular.module('andes.controllers', [])
         var found = 0;
         for (var i = 0; i < $scope.packet.length; i++) {
           if ($scope.packet[i].internalcode == data.internalcode) {
-            $rootScope.err("Pieza ya leida en esta gestión");
+            $rootScope.err("Pieza ya existe en esta gestión");
             found = 1;
             break;
           }
@@ -680,16 +817,30 @@ angular.module('andes.controllers', [])
         }
         
         if (found == 0) {
+          /*
           if (data.current_step != $scope.gol) {
             $rootScope.err("Pieza no se encuentra en la etapa indicada. Se encuentra en "+data.stepName);
             return;
           }
+          */
 
           $scope.packet.push({
             internalcode: data.internalcode,
             mark: data.mark,
             dimtype: data.dimtype,
-            ok: true
+            destination: data.stepId,
+            nextStep: {
+              id: data.nextStepId,
+              name: data.nextStepName
+            },
+            prevStep: {
+              id: data.prevStepId,
+              name: data.prevStepName
+            },
+            currentStep: {
+              id: data.stepId,
+              name: data.stepName
+            }
           });
         } 
         
@@ -732,9 +883,23 @@ angular.module('andes.controllers', [])
   }
   $scope.finishMover = function() {
     if ($scope.packet.length == 0) {
-      $rootScope.err("movimiento vacio, revise nuevamente");
+      $rootScope.err("movimiento vacio");
     }
     else {
+      $scope.finalMoves = [];
+      for (var i = 0; i < $scope.packet.length; i++) {
+        if ($scope.packet[i].destination != $scope.packet[i].currentStep.id) {
+          $scope.finalMoves.push($scope.packet[i]);
+        }
+      }
+
+      if ($scope.finalMoves.length == 0) {
+        $rootScope.err("sin movimientos");
+        return false;
+      }
+
+
+      console.log($scope.finalMoves);
       $scope.ejecutor = "";
       $scope.ejecutores = [];
       $rootScope.showload();
@@ -751,10 +916,24 @@ angular.module('andes.controllers', [])
     if ($scope.ejecutor == "") {
       $rootScope.err("Indique ejecutor de tarea");
       return;
-    }
+    }  
     $rootScope.confirmar("Esta seguro?", function() {
       $rootScope.showload();
-      //$scope.gol = > current_step
+      jQuery.post(app.rest+"ajax.mobile.data.php&a=Mover", {
+        ejecutor: $scope.ejecutor,
+        items: $scope.finalMoves, 
+        autor: localStorage.getItem('user')
+      }, function(data) {
+        $rootScope.hideload();
+        if (data.error) {
+          $rootScope.err(data.error);
+        }
+        else {
+          $scope.packet = [];
+          $scope.modalSalida.hide();
+          $rootScope.ok(data.msg);
+        }        
+      },"json");
 
     });
   };
@@ -789,9 +968,12 @@ angular.module('andes.controllers', [])
 
   $scope.permiso_bodega_crear = true;
   $scope.permiso_bodega_vconsumo = true;
-  $scope.permiso_prod_lotes = true;
-  $scope.permiso_prod_traslado = true;
-  $scope.permiso_prod_consulta = true;
+  $scope.permiso_prod_pm = true;
+  $scope.permiso_prod_corte = true;
+  $scope.permiso_prod_armado = true;
+  $scope.permiso_prod_soldadura = true;
+  $scope.permiso_prod_limpieza = true;
+  $scope.permiso_prod_calidad = true; 
   $scope.scanner = "";
 
   $ionicModal.fromTemplateUrl('templates/config.html', {
@@ -837,7 +1019,6 @@ angular.module('andes.controllers', [])
   
   $scope.start();
 
-
   $scope.ENTREGA = function() {
     $ionicHistory.nextViewOptions({
         historyRoot: true
@@ -853,14 +1034,37 @@ angular.module('andes.controllers', [])
     $state.go('main.valeconsumo'); 
   }
 
-  $scope.GENERAR_LOTES = function() {
+  $scope.RECEPCIONAR_OT = function() {
     $ionicHistory.nextViewOptions({
         historyRoot: true
     });
     $ionicHistory.clearCache();
-    $state.go('main.makelote');
+    $state.go('main.receiveot');
   };
 
+  $scope.ENTRADA_OT = function() {
+    $ionicHistory.nextViewOptions({
+        historyRoot: true
+    });
+    $ionicHistory.clearCache();
+    $state.go('main.makeloteentrada');
+  };
+
+  $scope.INICIAR = function(step) {
+    $ionicHistory.nextViewOptions({
+        historyRoot: true
+    });
+    $ionicHistory.clearCache();
+    $state.go('main.marcainicio', { step: step });
+  };
+
+  $scope.TERMINAR = function(step) {
+    $ionicHistory.nextViewOptions({
+        historyRoot: true
+    });
+    $ionicHistory.clearCache();
+    $state.go('main.marcatermino', { step: step });
+  };
   $scope.MOVER_PIEZA = function() {
     $ionicHistory.nextViewOptions({
         historyRoot: true
@@ -886,10 +1090,438 @@ angular.module('andes.controllers', [])
       else {
         $rootScope.err(data.msg);
       }
+    });
+  }
+})
+.controller('MarcainicioCtrl', function($scope, $state, $rootScope, $localStorage, $ionicModal, $http, $location, $timeout, $ionicLoading, $ionicPopup, $ionicHistory, $stateParams, $ionicPlatform) {
+  
 
+  var deregisterFirst = $ionicPlatform.registerBackButtonAction(
+    function() {
+      $ionicHistory.nextViewOptions({
+          historyRoot: true
+      });
+      $state.go('main.selector');
+    }, 100
+  );
+  $scope.modalSteper = null;
+  $scope.$on('$destroy', deregisterFirst);
+
+
+  $scope.barra = '';
+  $scope.stepName = '';
+
+  if ($stateParams.step == "3") { $scope.stepName = "CORTE"; }
+  if ($stateParams.step == "4") { $scope.stepName = "ARMADO"; }
+  if ($stateParams.step == "5") { $scope.stepName = "SOLDADURA"; }
+  if ($stateParams.step == "6") { $scope.stepName = "LIMPIEZA"; }
+  //if ($stateParams.step == "7") { $scope.stepName = "CALIDAD"; }
+  $scope.setStep = function(sx) {
+    $stateParams.step = sx;
+
+    if ($stateParams.step == "3") { $scope.stepName = "CORTE"; }
+    if ($stateParams.step == "4") { $scope.stepName = "ARMADO"; }
+    if ($stateParams.step == "5") { $scope.stepName = "SOLDADURA"; }
+    if ($stateParams.step == "6") { $scope.stepName = "LIMPIEZA"; }
+  }
+  $scope.etapaOK = function() {
+    $scope.modalSteper.hide();
+  };
+  $scope.modoEscaner = 'leer';
+  $scope.packet = [];
+  $scope.ejecutor = "";
+ 
+
+  $scope.$on('$ionicView.enter', function(obj, viewData){
+
+    if ($stateParams.step == "" || $stateParams.step == null) {
+      //$stateParams.step = "3";
+      $scope.ejecutor = "";
+      $scope.etapas = [{
+        id: 4,
+        name: 'ARMADO'
+      },{
+        id: 5,
+        name: 'SOLDADURA'
+      },{
+        id: 6,
+        name: 'LIMPIEZA'
+      }];
+
+      $ionicModal.fromTemplateUrl('templates/modal_step.html', {
+        scope: $scope,
+        animation: 'slide-in-up'
+      }).then(function(modal) {
+        $scope.modalSteper = modal;
+        $scope.modalSteper.show();
+      });
+    }
+
+    if (viewData.direction == 'back') {
+      $scope.popCloseable = null;
+      $scope.barra = '';
+      $scope.modoEscaner = 'leer';
+      $scope.packet = [];
+      $scope.ejecutor = "";
+    }
+  });
+
+  $scope.$on('$ionicView.beforeLeave', function(obj, viewData){
+    $scope.popCloseable = null;
+    $scope.barra = '';
+    $scope.modoEscaner = 'leer';
+    $scope.packet = [];
+    $scope.ejecutor = ""; 
+  }); 
+
+  $scope.cancelar = function() {
+    $scope.popCloseable = null;
+    $scope.barra = '';
+    $scope.modoEscaner = 'leer';
+    $scope.packet = [];
+    $scope.ejecutor = "";
+  }
+  $scope.borrar = function (IdPieza) {
+    for (var i = 0; i < $scope.packet.length; i++) {
+      if ($scope.packet[i].internalcode == IdPieza) {
+        $scope.packet.splice(i, 1);
+        break;
+      }
+    }
+  };
+
+  $scope.$on('scanner', function(event, args) {
+    if ($scope.modoEscaner == "leer") {
+      $scope.barra = document.getElementById('asigna_etapa_pieza').value;
+      $rootScope.showload();
+      jQuery.post(app.rest+"ajax.mobile.data.php&a=moving", { 
+        barra: $scope.barra, 
+        autor: localStorage.getItem('user'),
+        to: $stateParams.step,
+        action: "inicio"
+      }, function(data) {
+        $rootScope.hideload();
+        document.getElementById('asigna_etapa_pieza').value = "";
+        $scope.barra = "";
+        $rootScope.$apply();
+        if (data.error) {
+          $rootScope.err(data.error);
+          return;
+        }
+        if ($scope.packet.length > 0 && $scope.packet[0].OT!=data.OT) {
+          $rootScope.err("Pieza no corresponde a OT en trabajo");
+          return;
+        }
+        var found = 0;
+        for (var i = 0; i < $scope.packet.length; i++) {
+          if ($scope.packet[i].internalcode == data.internalcode) {
+            $rootScope.err("Pieza ya existe en esta gestión");
+            found = 1;
+            break;
+          }
+        }
+        if (found == 1) {
+          return;
+        }
+        
+        if (found == 0) {
+
+          $scope.packet.push({
+            internalcode: data.internalcode,
+            mark: data.mark,
+            dimtype: data.dimtype,
+            cardname: data.cardname,
+            OT: data.OT,
+            totalkg: parseFloat(data.totalkg)
+          });
+        } 
+        
+        
+        $scope.$broadcast('scroll.resize');
+        $rootScope.$apply();
+        document.getElementById('asigna_etapa_pieza').focus();
+
+      },"json");
+
+    }
+
+  });
+
+  $scope.modalInicio = null;
+  $scope.ejecutor = "";
+  $scope.ejecutores = [];
+
+  $ionicModal.fromTemplateUrl('templates/modal_emp_inicio.html', {
+    scope: $scope,
+    animation: 'slide-in-up'
+  }).then(function(modal) {
+    $scope.modalInicio = modal;
+  });
+  $scope.closeSalida = function() {
+    $scope.modalInicio.hide();
+  }
+  $scope.prepareInicio = function() {
+    if ($scope.packet.length == 0) {
+      $rootScope.err("movimiento vacio");
+    }
+    else {
+      $scope.ejecutor = "";
+      $scope.ejecutores = [];
+      $rootScope.showload();
+      jQuery.get(app.rest+"ajax.mobile.data.php&a=employee", function(data) {
+        $scope.ejecutores = data;
+        $rootScope.hideload();
+        $scope.modalInicio.show();
+      },"json");
+    }
+  }
+
+  $scope.setejecutor = function(x) { $scope.ejecutor = x; }
+  $scope.confirmada = function() {
+    if ($scope.ejecutor == "") {
+      $rootScope.err("Indique ejecutor de tarea");
+      return;
+    }  
+    $rootScope.confirmar("Esta seguro?", function() {
+      $rootScope.showload();
+      jQuery.post(app.rest+"ajax.mobile.data.php&a=trx_mover", {
+        ejecutor: $scope.ejecutor,
+        items: $scope.packet, 
+        autor: localStorage.getItem('user'),
+        to: $stateParams.step, 
+        action: "inicio"
+      }, function(data) {
+        $rootScope.hideload();
+        if (data.error) {
+          $rootScope.err(data.error);
+        }
+        else {
+          $scope.packet = [];
+          $scope.modalInicio.hide();
+          $rootScope.ok(data.msg);
+        }        
+      },"json");
+
+    });
+  };
+  $scope.cancelarInicio = function() {
+    $rootScope.confirmar("Salir?", function() {
+      $ionicHistory.clearCache();
+      $ionicHistory.nextViewOptions({
+          historyRoot: true
+      });
+      $state.go('main.selector');
+    }, function() {
     });
 
   }
+  document.getElementById('asigna_etapa_pieza').focus();
+})
+.controller('MarcaterminoCtrl', function($scope, $state, $rootScope, $localStorage, $ionicModal, $http, $location, $timeout, $ionicLoading, $ionicPopup, $ionicHistory, $stateParams, $ionicPlatform) {
+  
+
+  var deregisterFirst = $ionicPlatform.registerBackButtonAction(
+    function() {
+      $ionicHistory.nextViewOptions({
+          historyRoot: true
+      });
+      $state.go('main.selector');
+    }, 100
+  );
+  $scope.modalSteper = null;
+  $scope.$on('$destroy', deregisterFirst);
+
+
+  $scope.barra = '';
+  $scope.stepName = '';
+ 
+  if ($stateParams.step == "4") { $scope.stepName = "ARMADO"; }
+  if ($stateParams.step == "5") { $scope.stepName = "SOLDADURA"; } 
+  //if ($stateParams.step == "7") { $scope.stepName = "CALIDAD"; }
+  $scope.setStep = function(sx) {
+    $stateParams.step = sx;
+ 
+    if ($stateParams.step == "4") { $scope.stepName = "ARMADO"; }
+    if ($stateParams.step == "5") { $scope.stepName = "SOLDADURA"; } 
+  }
+  $scope.etapaOK = function() {
+    $scope.modalSteper.hide();
+  };
+  $scope.modoEscaner = 'leer';
+  $scope.packet = [];
+  $scope.ejecutor = "";
+ 
+
+  $scope.$on('$ionicView.enter', function(obj, viewData){
+
+    if ($stateParams.step == "" || $stateParams.step == null) {
+      //$stateParams.step = "3";
+      $scope.ejecutor = "";
+      $scope.etapas = [{
+        id: 4,
+        name: 'ARMADO'
+      },{
+        id: 5,
+        name: 'SOLDADURA'
+      }];
+
+      $ionicModal.fromTemplateUrl('templates/modal_step.html', {
+        scope: $scope,
+        animation: 'slide-in-up'
+      }).then(function(modal) {
+        $scope.modalSteper = modal;
+        $scope.modalSteper.show();
+      });
+    }
+
+    if (viewData.direction == 'back') {
+      $scope.popCloseable = null;
+      $scope.barra = '';
+      $scope.modoEscaner = 'leer';
+      $scope.packet = [];
+      $scope.ejecutor = "";
+    }
+  });
+
+  $scope.$on('$ionicView.beforeLeave', function(obj, viewData){
+    $scope.popCloseable = null;
+    $scope.barra = '';
+    $scope.modoEscaner = 'leer';
+    $scope.packet = [];
+    $scope.ejecutor = ""; 
+  }); 
+
+  $scope.cancelar = function() {
+    $scope.popCloseable = null;
+    $scope.barra = '';
+    $scope.modoEscaner = 'leer';
+    $scope.packet = [];
+    $scope.ejecutor = "";
+  }
+  $scope.borrar = function (IdPieza) {
+    for (var i = 0; i < $scope.packet.length; i++) {
+      if ($scope.packet[i].internalcode == IdPieza) {
+        $scope.packet.splice(i, 1);
+        break;
+      }
+    }
+  };
+
+  $scope.$on('scanner', function(event, args) {
+    if ($scope.modoEscaner == "leer") {
+      $scope.barra = document.getElementById('pieza_lote_salida').value;
+      $rootScope.showload();
+      jQuery.post(app.rest+"ajax.mobile.data.php&a=moving", { 
+        barra: $scope.barra, 
+        autor: localStorage.getItem('user'),
+        to: $stateParams.step,
+        action: "final"
+      }, function(data) {
+        $rootScope.hideload();
+        document.getElementById('pieza_lote_salida').value = "";
+        $scope.barra = "";
+        $rootScope.$apply();
+        if (data.error) {
+          $rootScope.err(data.error);
+          return;
+        }
+        if ($scope.packet.length > 0 && $scope.packet[0].OT!=data.OT) {
+          $rootScope.err("Pieza no corresponde a OT en trabajo");
+          return;
+        }
+        var found = 0;
+        for (var i = 0; i < $scope.packet.length; i++) {
+          if ($scope.packet[i].internalcode == data.internalcode) {
+            $rootScope.err("Pieza ya existe en esta gestión");
+            found = 1;
+            break;
+          }
+        }
+        if (found == 1) {
+          return;
+        }
+        
+        if (found == 0) {
+
+          $scope.packet.push({
+            internalcode: data.internalcode,
+            mark: data.mark,
+            dimtype: data.dimtype,
+            cardname: data.cardname,
+            OT: data.OT,
+            totalkg: parseFloat(data.totalkg)
+          });
+        } 
+        
+        
+        $scope.$broadcast('scroll.resize');
+        $rootScope.$apply();
+        document.getElementById('pieza_lote_salida').focus();
+
+      },"json");
+
+    }
+
+  });
+
+  $scope.modalInicio = null;
+  $scope.ejecutor = "";
+  $scope.ejecutores = [];
+
+  $ionicModal.fromTemplateUrl('templates/modal_emp_inicio.html', {
+    scope: $scope,
+    animation: 'slide-in-up'
+  }).then(function(modal) {
+    $scope.modalInicio = modal;
+  });
+  $scope.closeSalida = function() {
+    $scope.modalInicio.hide();
+  }
+  $scope.prepareTermino = function() {
+    if ($scope.packet.length == 0) {
+      $rootScope.err("movimiento vacio");
+    }
+    else {
+
+      $rootScope.confirmar("Esta seguro?", function() {
+        $rootScope.showload();
+        jQuery.post(app.rest+"ajax.mobile.data.php&a=trx_mover", {
+          ejecutor: $scope.ejecutor,
+          items: $scope.packet, 
+          autor: localStorage.getItem('user'),
+          to: $stateParams.step, 
+          action: "final"
+        }, function(data) {
+          $rootScope.hideload();
+          if (data.error) {
+            $rootScope.err(data.error);
+          }
+          else {
+            $scope.packet = [];
+            $scope.modalInicio.hide();
+            $rootScope.ok(data.msg);
+          }        
+        },"json");
+
+      });
+ 
+    }
+  }
+
+  $scope.setejecutor = function(x) { $scope.ejecutor = x; }
+ 
+  $scope.cancelarInicio = function() {
+    $rootScope.confirmar("Salir?", function() {
+      $ionicHistory.clearCache();
+      $ionicHistory.nextViewOptions({
+          historyRoot: true
+      });
+      $state.go('main.selector');
+    }, function() {
+
+    });
+  }
+  document.getElementById('pieza_lote_salida').focus();
 })
 String.prototype.toBytes = function() {
     var arr = []

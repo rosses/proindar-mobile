@@ -8,22 +8,29 @@
       <div ng-if="permiso_bodega_crear || permiso_bodega_vconsumo">
         <h2>BODEGA</h2>
         <button ng-if="permiso_bodega_crear" class="button button-royal button-default icon ion-qr-scanner" ng-click="ENTREGA()"> NUEVA ENTREGA</button>
-        <br /><br /><br />
+        <br /><br /> 
         <button ng-if="permiso_bodega_vconsumo" class="button button-royal button-default icon ion-qr-scanner" ng-click="VALE_CONSUMO()"> VALE DE CONSUMO</button>
-        <br /><br /><br />
+        <br /><br /> 
       </div>
-      <div ng-if="permiso_prod_lotes || permiso_prod_traslado || permiso_prod_consulta">
+      <div ng-if="permiso_prod_pm || permiso_prod_corte || permiso_prod_armado || permiso_prod_soldadura || permiso_prod_limpieza || permiso_prod_calidad">
         <h2>PRODUCCIÓN</h2>
-        <br />
-        <button ng-if="permiso_prod_lotes" class="button button-royal button-default icon ion-qr-scanner" ng-click="GENERAR_LOTES()"> GENERAR LOTES DESDE OT</button>
+        <button ng-if="permiso_prod_pm" class="button button-assertive button-default icon ion-qr-scanner" ng-click="RECEPCIONAR_OT()"> RECEPCIONAR OT</button>
+        <br /><br />
+        <button ng-if="permiso_prod_pm" class="button button-assertive button-default icon ion-qr-scanner" ng-click="INICIAR('3')"> ASIGNAR CORTE</button>
+        <br /><br />
+        <button ng-if="permiso_prod_pm" class="button button-assertive button-default icon ion-qr-scanner" ng-click="ENTRADA_OT()"> TERMINO CORTE Y LOTEO</button>
+        <br /><br />
+        <button ng-if="permiso_prod_pm" class="button button-royal button-default icon ion-qr-scanner" ng-click="INICIAR('')"> INICIAR ETAPA</button><br /><br />
+        <button ng-if="permiso_prod_pm" class="button button-royal button-default icon ion-qr-scanner" ng-click="TERMINAR('')"> TERMINAR ETAPA</button><br /><br />
+        <button ng-if="permiso_prod_pm" class="button button-royal button-default icon ion-qr-scanner" ng-click="CAMBIAR_ETAPA()"> CAMBIAR DE ETAPA</button> 
+        <br /><br />
+        <button ng-if="permiso_prod_pm" class="button button-assertive button-default icon ion-qr-scanner" ng-click="SALIDA_OT()"> LOTEO ENTREGA</button>
         <br /><br /><br />
-        <button ng-if="permiso_prod_traslado" class="button button-royal button-default icon ion-qr-scanner" ng-click="MOVER_PIEZA()"> TRASLADAR PIEZA</button>
-        <br /><br /><br />
-        <button ng-if="permiso_prod_consulta" class="button button-royal button-default icon ion-qr-scanner" ng-click="CONSULTAR_PRODUCTO()"> CONSULTAR PIEZA</button>
-        <br /><br /><br />
+        <h2>CALIDAD</h2>
+        <button ng-if="permiso_prod_pm" class="button button-royal button-default icon ion-qr-scanner" ng-click="MOVER_PIEZA()"> LIBERAR</button>
+        <br /><br /><br /> 
       </div>
     </div>
-
   </ion-content>
   <ion-footer-bar class="bar-assertive">
     <div class="row">

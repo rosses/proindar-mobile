@@ -1,8 +1,9 @@
 app = {
-  rest:  "http://proindar.enlanube.cl/require/load.php?call="
+  //rest:  "http://proindar.enlanube.cl/require/load.php?call="
+  rest:  "http://proindar.test/require/load.php?call="
 };
 
-angular.module('andes', ['ionic', 'andes.controllers','ngStorage','peanuthub-custom-keyboard'])
+angular.module('andes', ['ionic', 'andes.controllers','ngStorage','peanuthub-custom-keyboard', 'plgn.ionic-segment'])
 
 .run(function($ionicPlatform, $rootScope, $ionicHistory, $timeout, $state, $localStorage, $ionicPopup, $ionicLoading) {
   $ionicPlatform.ready(function() {
@@ -208,12 +209,24 @@ angular.module('andes', ['ionic', 'andes.controllers','ngStorage','peanuthub-cus
       warehouse: ''
     }
   })
-  .state('main.makelote', {
-    url: '/makelote',
+  .state('main.receiveot', {
+    url: '/receiveot',
     views: {
       'menuContent': {
-        templateUrl: 'templates/makelote.html',
-        controller: 'MakeloteCtrl'
+        templateUrl: 'templates/receiveot.html',
+        controller: 'ReceiveotCtrl'
+      }
+    },
+    params: {
+      warehouse: ''
+    }
+  })
+  .state('main.makeloteentrada', {
+    url: '/makeloteentrada',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/makeloteentrada.html',
+        controller: 'MakeloteentradaCtrl'
       }
     },
     params: {
@@ -232,6 +245,31 @@ angular.module('andes', ['ionic', 'andes.controllers','ngStorage','peanuthub-cus
       warehouse: ''
     }
   })
+  .state('main.marcainicio', {
+    url: '/marcainicio',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/marcainicio.html',
+        controller: 'MarcainicioCtrl'
+      }
+    },
+    params: {
+      step: ''
+    }
+  })
+  .state('main.marcatermino', {
+    url: '/marcatermino',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/marcatermino.html',
+        controller: 'MarcaterminoCtrl'
+      }
+    },
+    params: {
+      step: ''
+    }
+  })
+
 
   //$urlRouterProvider.otherwise('/main/home');
 })
@@ -313,10 +351,54 @@ function codigo() {
 function consumo() {
   var $body = angular.element(document.body);            // 1
   var $rootScope = $body.injector().get('$rootScope');   // 2b
-  document.getElementById('textbox_consumo').value = "VC0000100000005";
+  document.getElementById('textbox_consumo').value = "VC0000400000003";
   $rootScope.$broadcast("scanner", { });
   $rootScope.$apply();  
 }
+function ot0() {
+  var $body = angular.element(document.body);            // 1
+  var $rootScope = $body.injector().get('$rootScope');   // 2b
+  document.getElementById('textbox_ot1').value = "OT00000003";
+  $rootScope.$broadcast("scanner", { });
+  $rootScope.$apply();  
+}
+function recibir(z) {
+  var $body = angular.element(document.body);            // 1
+  var $rootScope = $body.injector().get('$rootScope');   // 2b
+  document.getElementById('textbox_bo1').value = (z ? z : "1219000010005");
+  $rootScope.$broadcast("scanner", { });
+  $rootScope.$apply();  
+}
+
+function asignar(z) {
+  var $body = angular.element(document.body);            // 1
+  var $rootScope = $body.injector().get('$rootScope');   // 2b
+  document.getElementById('asigna_etapa_pieza').value = (z ? z : "1219000010005");
+  $rootScope.$broadcast("scanner", { });
+  $rootScope.$apply();  
+}
+function terminar(z) {
+  var $body = angular.element(document.body);            // 1
+  var $rootScope = $body.injector().get('$rootScope');   // 2b
+  document.getElementById('asigna_etapa_pieza').value = (z ? z : "1219000010005");
+  $rootScope.$broadcast("scanner", { });
+  $rootScope.$apply();  
+}
+function lotear(z) {
+  var $body = angular.element(document.body);            // 1
+  var $rootScope = $body.injector().get('$rootScope');   // 2b
+  document.getElementById('pieza_lote_entrada').value = (z ? z : "1219000010005");
+  $rootScope.$broadcast("scanner", { });
+  $rootScope.$apply();  
+}
+function termino(z) {
+  var $body = angular.element(document.body);            // 1
+  var $rootScope = $body.injector().get('$rootScope');   // 2b
+  document.getElementById('pieza_lote_salida').value = (z ? z : "1219000010005");
+  $rootScope.$broadcast("scanner", { });
+  $rootScope.$apply();  
+}
+/*
 function ot() {
   var $body = angular.element(document.body);            // 1
   var $rootScope = $body.injector().get('$rootScope');   // 2b
@@ -324,20 +406,22 @@ function ot() {
   $rootScope.$broadcast("scanner", { });
   $rootScope.$apply();  
 }
-function pieza() {
+
+function lotear(z) {
   var $body = angular.element(document.body);            // 1
   var $rootScope = $body.injector().get('$rootScope');   // 2b
-  document.getElementById('textbox_box').value = "1219000010005";
+  document.getElementById('textbox_box').value = (z ? z : "1219000010005");
   $rootScope.$broadcast("scanner", { });
   $rootScope.$apply();  
 }
-function pieza2() {
+function mover(z) {
   var $body = angular.element(document.body);            // 1
   var $rootScope = $body.injector().get('$rootScope');   // 2b
-  document.getElementById('textbox_moveme').value = "1219000010005";
+  document.getElementById('textbox_moveme').value = (z ? z : "1219000010005");
   $rootScope.$broadcast("scanner", { });
   $rootScope.$apply();  
 }
+*/
 jQuery.ajaxSetup({
   type: 'POST',
   timeout: 5000,
