@@ -13,8 +13,19 @@ angular.module('andes', ['ionic', 'andes.controllers','ngStorage','peanuthub-cus
     $rootScope.id = "";
     $rootScope.nombre = "";
     $rootScope.usercode = "";
+
     if (!window.cordova) {
       $rootScope.usercode = ""; /* for demo porposes */
+    }
+    if (window.cordova) {
+      console.log('Registered PROINDAR Mobile')
+      window.plugins.intent.setNewIntentHandler(function (Intent) {
+          console.log("SCANNER INPUT",Intent);
+          if (Intent.scanner) {
+            $rootScope.$broadcast("scanner", { barcode: Intent.barcode });
+            $rootScope.$apply();
+          }
+      });
     }
     if (window.StatusBar) {
       // org.apache.cordova.statusbar required
@@ -400,8 +411,9 @@ jQuery.ajaxSetup({
   }
 });
 
-document.addEventListener('keypress', getInput, false);
+/*
 
+document.addEventListener('keypress', getInput, false);
 function getInput(e){
   if (e.which == 13) {
     var $body = angular.element(document.body);            // 1
@@ -410,4 +422,5 @@ function getInput(e){
     $rootScope.$apply();
   }
 }
+*/
 
