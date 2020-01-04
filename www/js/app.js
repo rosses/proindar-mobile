@@ -21,26 +21,6 @@ angular.module('andes', ['ionic', 'andes.controllers','ngStorage','peanuthub-cus
       cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
       cordova.plugins.Keyboard.disableScroll(true);
     }
-    if (window.cordova) {
-      console.log('Welcome cordova');
-      window.cordova.plugins.honeywell.selectDevice('dcs.scanner.imager', () => {
-        console.info('dcs.scanner.imager codebar device connected');
-        window.cordova.plugins.honeywell.claim(() => { 
-          console.info('claim success');
-          window.cordova.plugins.honeywell.disableTrigger(() => console.info('trigger disabled'));
-          window.cordova.plugins.honeywell.register(function(event) {
-            var $body = angular.element(document.body);            // 1
-            var $rootScope = $body.injector().get('$rootScope');   // 2b
-            $rootScope.$broadcast("scanner", { data: event });
-            $rootScope.$apply();           
-          }, function(err) { 
-            console.log(err); 
-          });
-        }, (err) => {
-          console.info(err);
-        });
-      }, (err) => { console.info(err); });
-    }
     if (window.StatusBar) {
       // org.apache.cordova.statusbar required
       StatusBar.styleDefault();
@@ -313,24 +293,11 @@ function() { // should be altered to suit your needs
 document.addEventListener("offline", function() {
   var $body = angular.element(document.body);            // 1
   var $rootScope = $body.injector().get('$rootScope');   // 2b
-  /*
-  $rootScope.nowifi();
-  if (window.cordova) { $rootScope.wifiread(); }
-  if (window.cordova && $rootScope.viendoDetalle == 1) {
-    window.cordova.plugins.honeywell.disableTrigger(() => console.info('trigger disabled'));
-  }
-  $rootScope.$apply();
-  */
 }, false);
 
 document.addEventListener("online", function() {
   var $body = angular.element(document.body);
   var $rootScope = $body.injector().get('$rootScope');
-  /*
-  if (window.cordova && $rootScope.viendoDetalle == 1) {
-    window.cordova.plugins.honeywell.enableTrigger(() => console.info('trigger enabled'));
-  }
-  */
   $rootScope.$apply();
 }, false);
 
