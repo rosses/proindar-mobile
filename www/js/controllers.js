@@ -984,10 +984,10 @@ angular.module('andes.controllers', [])
   });
 
   $scope.$on('scanner', function(event, args) {
-    $rootScope.usercode = document.getElementById('md5login').value;
+    console.log('scanner listening', args);
     if ($scope.scanner == "login") {
       $rootScope.showload();
-      jQuery.post(app.rest+"ajax.mobile.login.php", { credential: $rootScope.usercode }, function(data) {
+      jQuery.post(app.rest+"ajax.mobile.login.php", { credential: args.barcode }, function(data) {
         $rootScope.usercode = "";
         $rootScope.hideload();
         if (data.error) {
