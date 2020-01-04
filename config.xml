@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="cl.proindar.mobile" version="1.3.2" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+<widget id="cl.proindar.mobile" version="1.3.2" xmlns="http://www.w3.org/ns/widgets" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>PROINDAR</name>
     <description>
       PROINDAR
@@ -23,7 +23,7 @@
     <preference name="StatusBarOverlaysWebView" value="true" />
     <preference name="StatusBarStyle" value="lightcontent" />
     <preference name="android-build-tool" value="gradle" />
-    <preference name="AndroidLaunchMode" value="singleTask"/>
+    <preference name="AndroidLaunchMode" value="singleTask" />
     <feature name="StatusBar">
         <param name="ios-package" onload="true" value="CDVStatusBar" />
     </feature>
@@ -60,7 +60,7 @@
             <activity android:label="webIntentFilter" android:name="cl.proindar.mobile">
                 <intent-filter android:autoVerify="true">
                     <action android:name="android.intent.ACTION_DECODE_DATA" />
-                    <category android:name="android.intent.category.DEFAULT" /> 
+                    <category android:name="android.intent.category.DEFAULT" />
                 </intent-filter>
             </activity>
         </config-file>
