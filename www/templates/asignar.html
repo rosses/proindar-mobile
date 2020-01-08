@@ -1,0 +1,35 @@
+<ion-view view-title="ASIGNACION DE {{stepName}}" cache-view="false">
+  <ion-content scroll="false" class="home" on-swipe-right="onSwipeRight($event)" on-swipe-left="onSwipeLeft($event)">
+    <div>
+      <div class="header" ng-if="packet.length > 0">
+        <div style='font-size:18px; font-weight:bold;'>OT {{packet[0].OT}}</div>
+        <b>{{packet[0].cardname}}</b><br />
+      </div>
+
+      <ion-scroll direction="y" style="height: calc(100vh - 250px)">
+         
+        <h5 style='color:red; text-align:center;' ng-if="packet.length == 0">NO HAY PIEZAS<br />ESCANEA UN CODIGO PARA EMPEZAR</h5>
+        <br /> 
+        <div class="" style="display:inline-block; width:100%; margin-right: 20px; font-size: 25px; margin-bottom: 10px;" ng-repeat="linea in packet">
+          <div class="row">
+            <div class="col-100 conteo-articulo" style="width:100%;">
+              <button ng-click="borrar(linea.internalcode)" class="button button-assertive button-derecha">borrar</button>
+              <span>{{linea.internalcode}}</span><br /><i>Marca: <b>{{linea.mark}}</b><br />{{linea.totalkg}} kgs - {{linea.dimtype}}</i>
+            </div> 
+          </div>
+          
+        </div> 
+      </ion-scroll>
+    </div>
+
+  </ion-content>
+  <ion-footer-bar class="bar-stable">
+    <div class="row">
+      <div class="col col-100 text-center" style="margin-top: -10px;">
+        <button class="button button-dark" ng-click="cancelarInicio()">CANCELAR</button>
+        <button class="button button-assertive button-small" ng-if="packet.length > 0" ng-click="prepareInicio()">ASIGNAR {{stepName}}</button>
+      </div>
+    </div>
+    
+  </ion-footer-bar>
+</ion-view>

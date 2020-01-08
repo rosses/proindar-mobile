@@ -1,0 +1,37 @@
+<ion-view view-title="NUEVA ENTREGA">
+  <ion-content scroll="false" class="home" on-swipe-right="onSwipeRight($event)" on-swipe-left="onSwipeLeft($event)">
+    <div>
+      <table><tr><td>
+      <h4>MULTIPLICA LECTURA X  &nbsp;&nbsp;&nbsp;</h4>
+      </td><td><input id="custom_qty_wc" select-on-click ng-model="$root.custom_qty" type="tel" name="custom_qty_wc" class="custom_qty" /></td></tr></table>
+      <hr />
+      <ion-scroll direction="y" style="height: calc(100vh - 250px)">
+        <h5 style='color:red; text-align:center;' ng-if="inventory.length == 0">NO HAY PRODUCTOS<br />EN ESTE ENTREGA<br /><br />Empieza a leer productos</h5>
+        <div class="" style="display:inline-block; margin-right: 20px; font-size: 25px; margin-bottom: 10px;" ng-repeat="linea in inventory">
+          <div class="row">
+            <div class="col-67 conteo-articulo">
+              <span>{{linea.itemcode}}</span> {{linea.itemname}}
+            </div>
+            <div class="col-33 text-right">
+              <button ng-click="borrar(linea.itemcode)" class="button button-assertive button-derecha">borrar</button>
+              <br /><br />
+              <h4>{{linea.qty}} unids.</h4>
+              <h5 ng-if="eq != 1">SAP:<br />{{(linea.eq * linea.qty | number : 2)}} KG</h5>
+            </div>
+          </div>
+          
+        </div> 
+      </ion-scroll>
+    </div>
+
+  </ion-content>
+  <ion-footer-bar class="bar-stable">
+    <div class="row">
+      <div class="col col-100 text-center" style="margin-top: -10px;">
+        <button class="button button-dark" ng-click="cancelarEntrega()">CANCELAR</button>
+        <button class="button button-assertive button-small" ng-if="inventory.length > 0" ng-click="finishConteo()">ENVIAR A SAP</button>
+      </div>
+    </div>
+    
+  </ion-footer-bar>
+</ion-view>

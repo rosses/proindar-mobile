@@ -375,7 +375,8 @@ ion-content.pedido {
 	padding:10px;
 }
 .button-success {
-	background-color:#6be06b;
+	background-color:#47c147;
+	color:#FFF;
 }
 .btn-single-left {
 	padding: 0 !important;
@@ -423,4 +424,32 @@ ul.the_i_segment[proindar] li:last-child {
 ul.the_i_segment[proindar] li:last-child.active {
   background-color: #28a54c;
   color: #fff;
+}
+.button-derecha {
+	float: right;
+    font-size: 12px;
+    text-align: center;
+    padding: 0px;
+    height: 25px;
+    min-height: 25px;
+    line-height: 17px;
+}
+
+.btn-step {
+	padding: 8px;
+    font-size: 12px;
+    height: auto;
+    line-height: 10px;
+    min-height: 45px;
+}
+.row-step {
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+.row-step h5 {
+	font-size: 12px;
+	line-height: 28px;
+}
+.row-step .btn-step {
+
 }

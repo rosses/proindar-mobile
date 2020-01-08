@@ -1,15 +1,13 @@
 <ion-view view-title="RECEPCIÓN DE OT">
   <ion-content scroll="false" class="home" on-swipe-right="onSwipeRight($event)" on-swipe-left="onSwipeLeft($event)">
     <div ng-hide="enableOp">
-      <input type="text" ng-model="barra" id="textbox_ot1" readonly="readonly" placeholder="escanea una OT..." class="focusme" />
-      <br><br><br>
+      <br><br>
       <center>
         <h3>Escanee un código de OT</h3>
       </center>
     </div>
 
     <div ng-hide="!enableOp">
-      <input type="text" ng-model="pieza" id="textbox_bo1" readonly="readonly" placeholder="escanea un codigo de pieza..." class="focusme" />
       <div class="header">
         <div class="row">
           <div class="col-67">
@@ -31,7 +29,8 @@
         <div class="" style="display:inline-block; width:100%; margin-right: 20px; font-size: 25px; margin-bottom: 10px;" ng-repeat="linea in packet">
           <div class="row">
             <div class="col-100 conteo-articulo" style="width:100%;">
-              <button ng-click="borrar(linea.internalcode)" style="height: 20px; line-height: 20px; min-width: 20px; width: 20px; min-height: 20px; text-align: center; padding: 0px;" class="button button-assertive">X</button> <span>{{linea.internalcode}}</span><br /><i>Marca: <b>{{linea.mark}}</b><br />{{linea.kg}} kgs - {{linea.dimtype}}</i>
+              <button ng-click="borrar(linea.internalcode)" class="button button-assertive button-derecha">borrar</button>
+              <span>{{linea.internalcode}}</span><br /><i>Marca: <b>{{linea.mark}}</b><br />{{linea.kg}} kgs - {{linea.dimtype}}</i>
             </div> 
           </div>
           
