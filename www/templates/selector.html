@@ -49,7 +49,8 @@
       </div>
       <div ng-if="perm[16]">
         <h2>CALIDAD</h2>
-        <button ng-if="perm[16]" class="button button-royal button-default icon ion-qr-scanner" ng-click="MOVER_PIEZA()"> LIBERAR/RECHAZAR</button>
+        <button ng-if="perm[16]" class="button button-success" ng-click="CALIDAD('allow')"> LIBERAR</button>
+        <button ng-if="perm[16]" class="button button-assertive" ng-click="CALIDAD('reject')"> RECHAZAR</button>
         <br /><br />
       </div>
     </div>

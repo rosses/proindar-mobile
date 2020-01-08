@@ -98,6 +98,14 @@ angular.module('andes.controllers').controller('SelectorCtrl',
     $ionicHistory.clearCache();
     $state.go('main.terminar', { step: step });
   };
+  $scope.CALIDAD = function(metodo) {
+    $ionicHistory.nextViewOptions({
+        historyRoot: true
+    });
+    $ionicHistory.clearCache();
+    $state.go('main.calidad', { metodo: metodo });
+  };
+  
   $scope.MOVER_PIEZA = function() {
     $ionicHistory.nextViewOptions({
         historyRoot: true

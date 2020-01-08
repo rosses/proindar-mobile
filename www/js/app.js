@@ -1,6 +1,6 @@
 app = {
-  rest:  "http://proindar.enlanube.cl/require/load.php?call="
-  //rest:  "http://proindar.test/require/load.php?call="
+  //rest:  "http://proindar.enlanube.cl/require/load.php?call="
+  rest:  "http://proindar.test/require/load.php?call="
 };
 
 angular.module('andes', ['ionic', 'andes.controllers','ngStorage','peanuthub-custom-keyboard', 'plgn.ionic-segment'])
@@ -200,6 +200,18 @@ angular.module('andes', ['ionic', 'andes.controllers','ngStorage','peanuthub-cus
         templateUrl: 'templates/receiveot.html',
         controller: 'ReceiveotCtrl'
       }
+    }
+  })
+  .state('main.calidad', {
+    url: '/calidad',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/calidad.html',
+        controller: 'CalidadCtrl'
+      }
+    },
+    params: {
+      metodo: ''
     }
   })
   .state('main.cambiar', {
