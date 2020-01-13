@@ -1,6 +1,6 @@
 app = {
-  rest:  "http://proindar.enlanube.cl/require/load.php?call="
-  //rest:  "http://proindar.test/require/load.php?call="
+  //rest:  "http://proindar.enlanube.cl/require/load.php?call="
+  rest:  "http://proindar.test/require/load.php?call="
 };
 
 angular.module('andes', ['ionic', 'andes.controllers','ngStorage','peanuthub-custom-keyboard', 'plgn.ionic-segment'])
@@ -320,7 +320,10 @@ function scanner(z) {
   $rootScope.$broadcast("scanner", { barcode: (z ? z : "") });
   $rootScope.$apply();  
 }
-
+function playerror() {
+  var audio = new Audio('error.wav');
+  audio.play();
+}
 jQuery.ajaxSetup({
   type: 'POST',
   timeout: 5000,

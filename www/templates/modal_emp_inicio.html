@@ -1,19 +1,15 @@
 <ion-modal-view>
 <ion-header-bar class="bar-assertive">
-  <h1 class="title">FINALIZAR</h1>
+  <h1 class="title">LEA CREDENCIAL O SELECCIONE</h1>
 </ion-header-bar>
 <ion-content style="padding:15px; text-align:center;" class="modallle">
-<h5>Escanee una credencial o asigne un ejecutor</h5>
-<ion-list>
-  <ion-radio style="font-size:13px;" ng-click="setejecutor(r.id)" ng-model="ejecutorxx" ng-value="r.id" ng-repeat="r in ejecutores">{{r.name}}</ion-radio>
-</ion-list>
-
+	<ion-radio class="proindar-nowrap" ng-model="ejecutor.id" ng-value="r.id" ng-repeat="r in ejecutores">{{r.name}}</ion-radio>
 </ion-content>
 <ion-footer-bar class="bar-stable">
 <div class="row">
   <div class="col col-100 text-center" style="margin-top: -10px;">
     <button class="button button-dark" ng-click="closeSalida()">CANCELAR</button>
-    <button class="button button-assertive button-small" ng-click="confirmada()">CONFIRMAR</button>
+    <button class="button button-balanced button-small" ng-click="confirmada()">CONFIRMAR</button>
   </div>
 </div>
 

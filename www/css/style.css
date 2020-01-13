@@ -345,6 +345,9 @@ ion-content.pedido {
 .button-royal {
 	background-color:#042e7a !important;
 }
+.bar-footer {
+	background-color:#f39c12 !important;
+}
 .bar-footer .button {
 	height: 35px !important;
 	min-height: 35px !important;
@@ -448,8 +451,101 @@ ul.the_i_segment[proindar] li:last-child.active {
 }
 .row-step h5 {
 	font-size: 12px;
-	line-height: 28px;
 }
 .row-step .btn-step {
 
+}
+.piece_container {
+	margin-top: 10px;
+	height: calc(100vh - 39vh);
+	text-align: left;
+}
+.piece_container2 {
+	margin-top: 10px;
+	height: calc(100vh - 50vh);
+	text-align: left;
+}
+.piece {
+    vertical-align: top;
+    border: 2px solid black;
+    padding: 3px;
+    font-size: 12.5px;
+    display: inline-block;
+    margin: 5px;
+    text-align: center;
+    min-width: calc(33% - 10px);
+}
+.piece.on {
+	color:white;
+	background-color:green;
+}
+.button-balanced {
+	background-color:green !important;
+}
+.paquete {
+	font-size: 17px;
+	font-weight: bold;
+}
+.proindar-tab {
+	position: relative;
+	text-align: center;
+}
+.proindar-tab-2 {
+	width: 50%;
+	display: inline-block;
+	vertical-align: top;
+	cursor: pointer;
+}
+.proindar-tab-3 {
+	width: 33.3%;
+	display: inline-block;
+	vertical-align: top;
+	cursor: pointer;
+}
+.proindar-in {
+	padding: 10px;
+	text-align: center;
+	border-bottom: 2px solid #FFF;
+}
+.proindar-in.sel {
+	font-weight: bold;
+	color: green;
+	border-bottom: 2px solid green;
+}
+.piece-title {
+  font-weight: bold;
+  font-size: 18px;
+  text-align: left;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  background-color:#ffe170;
+}
+.piece-title .col-67 {
+	padding: 5px;
+}
+.piece-group {
+	margin-bottom: 15px;
+}
+.piece-title .button-balanced {
+	background-color:transparent !important;
+	font-weight: bold;
+	color:green;
+	border: 2px solid green;
+}
+.piece-title .button-assertive {
+	background-color:transparent !important;
+	font-weight: bold;
+	color:red;
+	border: 2px solid red;
+}
+.proindar-nowrap .item-content {
+
+}
+.proindar-nowrap .radio-icon {
+	top: -5px;
+	color: green;
+}
+.item-radio input:checked + .radio-content .item-content {
+	background-color: #b6ffbd;
+	font-weight: bold;
 }

@@ -3,38 +3,66 @@
     <div ng-hide="enableOp">
       <br><br>
       <center>
-        <h3>Escanee un código de OT</h3>
+        <h3>Recepción desde planificación<br /><br />Escanee un código de OT<br />o escanea una pieza</h3>
       </center>
     </div>
 
     <div ng-hide="!enableOp">
+
       <div class="header">
         <div class="row">
           <div class="col-67">
             <div style='font-size:18px; font-weight:bold;'>OT {{ot.ot}}-{{ot.corr}}</div>
             <b>{{ot.cardname}}</b><br />
-            <i>{{ot.unReceived.length}} pendientes de recibir</i>
-            <br />
+            <div class="paquete">{{getSelected()}} aceptada de {{ot.pieces.length}}</div> 
           </div>
-          <div class="col-33">
-            <button class="button button-balanced button-small" ng-if="enableOp && ot.unReceived.length > 0" ng-click="recibirTodo()">RECIBIR TODO LO PENDIENTE</button>
+          <div class="col-33 text-right">
+            <button class="button button-balanced button-small" ng-if="enableOp && ot.pieces.length > 0" ng-click="marcarTodo()">TODO</button>
+            <button class="button button-assertive button-small" ng-if="enableOp && ot.pieces.length > 0" ng-click="desmarcarTodo()">NADA</button>
           </div>
         </div>
       </div>
 
-      <ion-scroll direction="y" style="height: calc(100vh - 250px)">
-         
-        <h5 style='color:red; text-align:center;' ng-if="packet.length == 0"><br /><br />PARA RECIBIR UNA PIEZA<br /><br />LEA UN COD. DE BARRA</h5>
-        <br /> 
-        <div class="" style="display:inline-block; width:100%; margin-right: 20px; font-size: 25px; margin-bottom: 10px;" ng-repeat="linea in packet">
-          <div class="row">
-            <div class="col-100 conteo-articulo" style="width:100%;">
-              <button ng-click="borrar(linea.internalcode)" class="button button-assertive button-derecha">borrar</button>
-              <span>{{linea.internalcode}}</span><br /><i>Marca: <b>{{linea.mark}}</b><br />{{linea.kg}} kgs - {{linea.dimtype}}</i>
-            </div> 
+      <div class="proindar-tab">
+        <div class="proindar-tab-2">
+          <div class="proindar-in" ng-click="changeTab('marca')" ng-class="{sel: activeTab == 'marca'}">Por marca</div>
+        </div><div class="proindar-tab-2">
+          <div class="proindar-in" ng-click="changeTab('panel')" ng-class="{sel: activeTab == 'panel'}">Por p/corte</div>
+        </div>
+      </div>
+      <ion-scroll direction="y" class="piece_container">
+        <div ng-hide="activeTab == 'panel'">
+          <div ng-repeat="grupo in groupMarca()" class="piece-group">
+            <div class="piece-title">
+              <div class="row">
+                <div class="col-67">{{grupo}}</div>
+                <div class="col-33 text-right">
+                  <button class="button button-balanced button-small" ng-if="enableOp && ot.pieces.length > 0" ng-click="changeTodoGrupo('mark',grupo,true)">TODO</button>
+                  <button class="button button-assertive button-small" ng-if="enableOp && ot.pieces.length > 0" ng-click="changeTodoGrupo('mark',grupo,false)">NADA</button>
+                </div>
+              </div>
+            </div>
+            <div class="piece" ng-click="piece.selected = !piece.selected" ng-repeat="piece in groupMarcaPiece(grupo)" ng-class="{on: piece.selected}">
+              {{piece.mark}} / {{piece.corr}}
+            </div>
           </div>
-          
-        </div> 
+        </div>
+        <div ng-hide="activeTab == 'marca'">
+          <div ng-repeat="grupo in groupPanel()" class="piece-group">
+            <div class="piece-title">
+              <div class="row">
+                <div class="col-67">P{{grupo}}</div>
+                <div class="col-33 text-right">
+                  <button class="button button-balanced button-small" ng-if="enableOp && ot.pieces.length > 0" ng-click="changeTodoGrupo('p_module',grupo,true)">TODO</button>
+                  <button class="button button-assertive button-small" ng-if="enableOp && ot.pieces.length > 0" ng-click="changeTodoGrupo('p_module',grupo,false)">NADA</button>
+                </div>
+              </div>
+            </div>
+            <div class="piece" ng-click="piece.selected = !piece.selected" ng-repeat="piece in groupPanelPiece(grupo)" ng-class="{on: piece.selected}">
+              {{piece.mark}} / {{piece.corr}}
+            </div>
+          </div> 
+        </div>
       </ion-scroll>
     </div>
 
@@ -43,7 +71,7 @@
     <div class="row">
       <div class="col col-100 text-center" style="margin-top: -10px;">
         <button class="button button-dark" ng-click="cancelarRecibir()">CANCELAR</button>
-        <button class="button button-assertive button-small" ng-if="enableOp && packet.length > 0" ng-click="confirmarRecibir()">CONFIRMAR RECIBIR</button>
+        <button class="button button-balanced button-small" ng-if="enableOp && getSelected() > 0" ng-click="confirmarRecibir()">CONFIRMAR RECIBIR</button>
       </div>
     </div>
     

@@ -1,24 +1,86 @@
 <ion-view view-title="ASIGNACION DE {{stepName}}" cache-view="false">
   <ion-content scroll="false" class="home" on-swipe-right="onSwipeRight($event)" on-swipe-left="onSwipeLeft($event)">
-    <div>
-      <div class="header" ng-if="packet.length > 0">
-        <div style='font-size:18px; font-weight:bold;'>OT {{packet[0].OT}}</div>
-        <b>{{packet[0].cardname}}</b><br />
+    <div ng-hide="ot">
+      <center>
+        <h3><br /><br />Asignación de {{stepName}}<br /><br />Escanee un código de OT<br />o escanea una pieza</h3>
+      </center>
+    </div>
+    <div ng-hide="!ot">
+      <div class="header">
+        <div class="row">
+          <div class="col-67">
+            <div style='font-size:18px; font-weight:bold;'>OT {{ot.ot}}-{{ot.corr}}</div>
+            <b>{{ot.cardname}}</b><br />
+            <div class="paquete">{{getSelected()}} asignada de {{ot.pieces.length}}</div> 
+          </div>
+          <div class="col-33 text-right">
+            <button class="button button-balanced button-small" ng-if="enableOp && ot.pieces.length > 0" ng-click="marcarTodo()">TODO</button>
+            <button class="button button-assertive button-small" ng-if="enableOp && ot.pieces.length > 0" ng-click="desmarcarTodo()">NADA</button>
+          </div>
+        </div>
       </div>
 
-      <ion-scroll direction="y" style="height: calc(100vh - 250px)">
-         
-        <h5 style='color:red; text-align:center;' ng-if="packet.length == 0">NO HAY PIEZAS<br />ESCANEA UN CODIGO PARA EMPEZAR</h5>
-        <br /> 
-        <div class="" style="display:inline-block; width:100%; margin-right: 20px; font-size: 25px; margin-bottom: 10px;" ng-repeat="linea in packet">
-          <div class="row">
-            <div class="col-100 conteo-articulo" style="width:100%;">
-              <button ng-click="borrar(linea.internalcode)" class="button button-assertive button-derecha">borrar</button>
-              <span>{{linea.internalcode}}</span><br /><i>Marca: <b>{{linea.mark}}</b><br />{{linea.totalkg}} kgs - {{linea.dimtype}}</i>
-            </div> 
+      <div class="proindar-tab">
+        <div class="proindar-tab-2" ng-hide="stepName != 'CORTE'">
+          <div class="proindar-in" ng-click="changeTab('panel')" ng-class="{sel: activeTab == 'panel'}">Por p/corte</div>
+        </div><div class="proindar-tab-2" ng-hide="stepName == 'CORTE'">
+          <div class="proindar-in" ng-click="changeTab('lote_internal')" ng-class="{sel: activeTab == 'lote_internal'}">Por lote</div>
+        </div><div class="proindar-tab-2">
+          <div class="proindar-in" ng-click="changeTab('marca')" ng-class="{sel: activeTab == 'marca'}">Por marca</div>
+        </div>
+      </div>
+      <ion-scroll direction="y" class="piece_container">
+        <!-- Agrupar por marca -->
+        <div ng-hide="activeTab == 'panel' || activeTab == 'lote_internal'">
+          <div ng-repeat="grupo in groupMarca()" class="piece-group">
+            <div class="piece-title">
+              <div class="row">
+                <div class="col-67">{{grupo}}</div>
+                <div class="col-33 text-right">
+                  <button class="button button-balanced button-small" ng-if="enableOp && ot.pieces.length > 0" ng-click="changeTodoGrupo('mark',grupo,true)">TODO</button>
+                  <button class="button button-assertive button-small" ng-if="enableOp && ot.pieces.length > 0" ng-click="changeTodoGrupo('mark',grupo,false)">NADA</button>
+                </div>
+              </div>
+            </div>
+            <div class="piece" ng-click="piece.selected = !piece.selected" ng-repeat="piece in groupMarcaPiece(grupo)" ng-class="{on: piece.selected}">
+              {{piece.mark}} / {{piece.corr}}
+            </div>
           </div>
-          
-        </div> 
+        </div>
+        <!-- Agrupar por panel -->
+        <div ng-hide="activeTab == 'marca' || activeTab == 'lote_internal'">
+          <div ng-repeat="grupo in groupPanel()" class="piece-group">
+            <div class="piece-title">
+              <div class="row">
+                <div class="col-67">P{{grupo}}</div>
+                <div class="col-33 text-right">
+                  <button class="button button-balanced button-small" ng-if="enableOp && ot.pieces.length > 0" ng-click="changeTodoGrupo('p_module',grupo,true)">TODO</button>
+                  <button class="button button-assertive button-small" ng-if="enableOp && ot.pieces.length > 0" ng-click="changeTodoGrupo('p_module',grupo,false)">NADA</button>
+                </div>
+              </div>
+            </div>
+            <div class="piece" ng-click="piece.selected = !piece.selected" ng-repeat="piece in groupPanelPiece(grupo)" ng-class="{on: piece.selected}">
+              {{piece.mark}} / {{piece.corr}}
+            </div>
+          </div> 
+        </div>
+        <!-- Agrupar por lote -->
+        <div ng-hide="activeTab == 'panel' || activeTab == 'marca'">
+          <div ng-repeat="grupo in groupLote()" class="piece-group">
+            <div class="piece-title">
+              <div class="row">
+                <div class="col-67">LOTE {{grupo}}</div>
+                <div class="col-33 text-right">
+                  <button class="button button-balanced button-small" ng-if="enableOp && ot.pieces.length > 0" ng-click="changeTodoGrupo('lote_internal',grupo,true)">TODO</button>
+                  <button class="button button-assertive button-small" ng-if="enableOp && ot.pieces.length > 0" ng-click="changeTodoGrupo('lote_internal',grupo,false)">NADA</button>
+                </div>
+              </div>
+            </div>
+            <div class="piece" ng-click="piece.selected = !piece.selected" ng-repeat="piece in groupLotePiece(grupo)" ng-class="{on: piece.selected}">
+              {{piece.mark}} / {{piece.corr}}
+            </div>
+          </div> 
+        </div>
       </ion-scroll>
     </div>
 
@@ -27,7 +89,7 @@
     <div class="row">
       <div class="col col-100 text-center" style="margin-top: -10px;">
         <button class="button button-dark" ng-click="cancelarInicio()">CANCELAR</button>
-        <button class="button button-assertive button-small" ng-if="packet.length > 0" ng-click="prepareInicio()">ASIGNAR {{stepName}}</button>
+        <button class="button button-balanced button-small" ng-if="getSelected() > 0" ng-click="prepareInicio()">ASIGNAR {{stepName}}</button>
       </div>
     </div>
     

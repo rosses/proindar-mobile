@@ -22,6 +22,7 @@ angular.module('andes.controllers').controller('SelectorCtrl',
         $rootScope.hideload();
         if (data.error) {
           $rootScope.err(data.error);
+          playerror();
         }
         else { 
           $rootScope.nombre = data.name;
@@ -42,6 +43,12 @@ angular.module('andes.controllers').controller('SelectorCtrl',
     }
 
   });
+
+  $scope.close = function() {
+    localStorage.removeItem('user');
+    $scope.modoEscaner = 'login';
+    $scope.modalConfiguracion.show();    
+  }
   
   $scope.start = function(x) {
     setTimeout(function() {

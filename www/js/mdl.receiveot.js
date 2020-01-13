@@ -1,164 +1,169 @@
 angular.module('andes.controllers')
 .controller('ReceiveotCtrl', function($scope, $state, $rootScope, $localStorage, $ionicModal, $http, $location, $timeout, $ionicLoading, $ionicPopup, $ionicHistory, $stateParams, $ionicPlatform, $ionicScrollDelegate) {
   $scope.popCloseable = null;
-  $scope.packet = [];
   $scope.modoEscaner = 'leer';
   $scope.enableOp = false;
   $scope.ot = null;
-  $scope.grupo = localStorage.getItem('ocip');
+  $scope.activeTab = 'marca';
 
   $scope.$on('$ionicView.enter', function(obj, viewData){
     if (viewData.direction == 'back') {
       $scope.popCloseable = null;
-      $scope.packet = [];
       $scope.modoEscaner = 'leer';
       $scope.enableOp = false;
       $scope.ot = null;
+      $scope.activeTab = 'marca';
     }
   });
 
   $scope.$on('$ionicView.beforeLeave', function(obj, viewData){
     $scope.popCloseable = null;
-    $scope.packet = [];
     $scope.modoEscaner = 'leer';
     $scope.enableOp = false;
     $scope.ot = null;
+    $scope.activeTab = 'marca';
   }); 
-  $scope.recibirTodo = function() {
-    $rootScope.confirmar('Confirmar la recepción de '+$scope.ot.unReceived.length+' piezas?', function() {      
-      var sender = [];
-      for (var i = 0; i < $scope.ot.unReceived.length; i++) {
-        sender.push({
-          internalcode: $scope.ot.unReceived[i].internalcode
-        });
-      }
-      $rootScope.showload();
-      jQuery.post(app.rest+"ajax.mobile.data.php&a=pm_all", { 
-        ot: $scope.ot.id, 
-        autor: localStorage.getItem('user') 
-      }, function(data) {
-        $rootScope.hideload();
-        if (data.error) { 
-          $rootScope.err(data.error); 
-          return; 
-        }
-        $rootScope.ok(data.msg);
-        $scope.ot = null;
-        $scope.enableOp = false;
-        $scope.packet = [];
-        $scope.modoEscaner = "leer";
-        $scope.$broadcast('scroll.resize');
-        $rootScope.$apply();
-      },"json");
 
-    });
+  $scope.marcarTodo = function() {
+    for (var i = 0; i < $scope.ot.pieces.length; i++) {
+      $scope.ot.pieces[i].selected = true;
+    }
+  };
+  $scope.desmarcarTodo = function() {
+    for (var i = 0; i < $scope.ot.pieces.length; i++) {
+      $scope.ot.pieces[i].selected = false;
+    }
   };
 
-  $scope.borrar = function (internalcode) {
-    $rootScope.confirmar('Quitar?', function() {
-      for (var i = 0; i < $scope.packet.length; i++) {
-        if ($scope.packet[i].internalcode == internalcode) {
-          $scope.packet.splice(i,1);
-          break;
+  $scope.getSelected = function() {
+    var t = 0;
+    if ($scope.ot) {
+      for (var i = 0; i < $scope.ot.pieces.length; i++) {
+        if ($scope.ot.pieces[i].selected) {
+          t++;
         }
       }
-    });
-  };
-  $scope.$on('scanner', function(event, args) {
-    console.log('selectorCtrl::scanner::mode->'+$scope.modoEscaner+'::', args);
+    }
+    return t;
+  } 
+  $scope.$on('scanner', function(event, args) { 
     if ($scope.modoEscaner == "leer") {
       $rootScope.showload();
-      jQuery.post(app.rest+"ajax.mobile.data.php&a=ot", { barra: args.barcode }, function(data) {
+      jQuery.post(app.rest+"ajax.mobile.data.php&a=ot&find=unreceived", { barra: args.barcode }, function(data) {
         $rootScope.hideload();
         if (data.error) { 
           $rootScope.err(data.error); 
+          playerror();
           return; 
         }
-        if (data.unReceived.length == 0) { 
-          $rootScope.err("No hay piezas pendientes para recibir en la OT indicada"); 
+        if (data.pieces.length == 0) { 
+          $rootScope.err("No hay piezas pendientes en la OT "+data.ot+"-"+data.corr); 
+          playerror();
           return;
         }
         $scope.ot = data;
+        var found = 0;
+        for (var i = 0; i < $scope.ot.pieces.length; i++) {
+          $scope.ot.pieces[i].selected = false;
+          if ($scope.ot.pieces[i].internalcode == args.barcode) {
+            $scope.ot.pieces[i].selected = true;
+            found = 1;
+          }
+        }
+        if (found == 0) {
+          $rootScope.err("Se cargo la OT, pero la pieza no está disponible");
+          playerror();
+        }
         $scope.enableOp = true;
-        $scope.packet = [];
-        $scope.modoEscaner = "lotear";
+        $scope.modoEscaner = "pieza";
         $scope.$broadcast('scroll.resize');
         $rootScope.$apply(); 
-      },"json");;
+      },"json");
     }
-    else if ($scope.modoEscaner == "lotear") {
+    else if ($scope.modoEscaner == "pieza") {
+      var found = 0;
+      for (var i = 0; i < $scope.ot.pieces.length; i++) {
+        if ($scope.ot.pieces[i].internalcode == args.barcode) {
+          $scope.ot.pieces[i].selected = true;
+          found = 1;
+          break;
+        }
+      }
+      if (found == 0) {
+        $rootScope.err("No se encontro en la lista la pieza");
+        playerror();
+      }
+    } 
+  });
+  $scope.groupMarca = function() {
+    var g = [];
+    if ($scope.ot) {
+      for (var i = 0; i < $scope.ot.pieces.length; i++) {
+        if (g.indexOf($scope.ot.pieces[i].mark) == -1) {
+          g.push($scope.ot.pieces[i].mark);
+        }
+      }
+    }
+    return g;
+  }
+  $scope.groupMarcaPiece = function(x) {
+    if ($scope.ot) { 
+      return $scope.ot.pieces.filter(function(item){ return item['mark'] === x; }).map(function (a) { return a; });
+    }
+  }
+  $scope.groupPanel = function() {
+    var g = [];
+    if ($scope.ot) {
+      for (var i = 0; i < $scope.ot.pieces.length; i++) {
+        if (g.indexOf($scope.ot.pieces[i].p_module) == -1) {
+          g.push($scope.ot.pieces[i].p_module);
+        }
+      }
+    }
+    return g;
+  }
+  $scope.groupPanelPiece = function(x) {
+    if ($scope.ot) { 
+      return $scope.ot.pieces.filter(function(item){ return item['p_module'] === x; }).map(function (a) { return a; });
+    }
+  }
+  $scope.changeTodoGrupo = function(llave,grupo,b) {
+    if ($scope.ot) { $scope.ot.pieces.filter(function(item){ return item[llave] === grupo; }).map(function (a) { a.selected = b; }); }
+  }
+
+  $scope.changeTab = function(a) {
+    $scope.activeTab = a;
+  }
+  $scope.confirmarRecibir = function() {
+    $rootScope.confirmar("¿Desea confirmar la recepción para PREPARACIÓN DE MATERIAL de "+$scope.getSelected()+" piezas?", function() {
       $rootScope.showload();
-      jQuery.post(app.rest+"ajax.mobile.data.php&a=pieza&to=packet", { barra: args.barcode }, function(data) {
+      var moving = $scope.ot.pieces.filter(({ selected }) => selected).map(({ internalcode }) => internalcode);
+      jQuery.post(app.rest+"ajax.mobile.data.php&a=update", { 
+        to: 2,
+        pieces: moving,
+        by: localStorage.getItem('user')
+      }, function(data) {
         $rootScope.hideload();
-        $scope.pieza = "";
-        $rootScope.$apply();
         if (data.error) {
           $rootScope.err(data.error);
           return;
         }
-        var add = 1;
-        for (var i = 0; i < $scope.packet.length; i++) {
-          if ($scope.packet[i].internalcode == data.internalcode) {
-            $rootScope.err("Pieza ya existe");
-            add = 0;
-            break;
-          }
-        }
-        if (data.OT != $scope.ot.fullname) {
-          add = 0;
-          $rootScope.err("Pieza leida es de otra OT");
-        }
-        if (add==1) {
-          $scope.packet.push({
-            mark: data.mark,
-            dimtype: data.dimtype,
-            kg: parseFloat(data.totalkg),
-            internalcode: data.internalcode
-          });
-        }
+        $rootScope.ok(data.msg);
+        $scope.ot = null;
+        $scope.enableOp = false;
+        $scope.modoEscaner = "leer";
+        $scope.activeTab = 'marca';
         $scope.$broadcast('scroll.resize');
-        $ionicScrollDelegate.scrollBottom();
         $rootScope.$apply();
-      },"json");
-
-    } 
-  });
-  $scope.confirmarRecibir = function() {
-    if ($scope.packet.length == 0) {
-      $rootScope.err("No esta recibiendo nada");
-    }
-    else {
-      $rootScope.confirmar("Desea confirmar la recepción para P.M?", function() {
-        $rootScope.showload();
-        jQuery.post(app.rest+"ajax.mobile.data.php&a=pm", { 
-          ot: $scope.ot.id,
-          items: $scope.packet,
-          autor: localStorage.getItem('user')
-        }, function(data) {
-          $rootScope.hideload();
-          if (data.error) {
-            $rootScope.err(data.error);
-            return;
-          }
-          $rootScope.ok(data.msg);
-          $scope.ot = null;
-          $scope.enableOp = false;
-          $scope.packet = [];
-          $scope.modoEscaner = "leer";
-          $scope.$broadcast('scroll.resize');
-          $rootScope.$apply();
-        },"json");
-      });
-    }
+      },"json"); 
+    }); 
   }
-
   $scope.cancelarRecibir = function() {
-    $rootScope.confirmar("Volver al inicio?", function() {
-      $ionicHistory.nextViewOptions({
-          historyRoot: true
-      });
-      $state.go('main.selector');
-    }, function() {
-    });
+    if ($scope.ot) { $rootScope.confirmar("Cancelar?", function() { $scope.chao(); }); }
+    else { $scope.chao(); }
+  }
+  $scope.chao = function() {
+    $ionicHistory.nextViewOptions({ historyRoot: true }); 
+    $state.go('main.selector');
   }
 })

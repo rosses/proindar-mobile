@@ -15,35 +15,40 @@
         <h2>PRODUCCIÓN</h2>
         
         <div class="row row-step">
-          <div class="col-50 text-left"><h5>PREPARACION DE MATERIALES</h5></div>
-          <div class="col-50 text-right"><button ng-if="perm[3]" class="button button-assertive btn-step" ng-click="RECEPCIONAR_OT()"> RECEPCIONAR OT</button></div>
+          <div class="col-33 text-left"><h5>PREP. MATERIALES</h5></div>
+          <div class="col-67 text-center"><button ng-if="perm[3]" class="button button-calm btn-step" ng-click="RECEPCIONAR_OT()"> RECEPCIONAR OT</button></div>
         </div>
         <div class="row row-step">
-          <div class="col-25 text-left"><h5>CORTE</h5></div>
-          <div class="col-25 text-center"><button ng-if="perm[4]" class="button button-royal btn-step" ng-click="INICIAR('3')"> ASIGNAR</button></div>
-          <div class="col-25 text-center"><button ng-if="perm[5]" class="button button-assertive btn-step" ng-click="TERMINAR('3')"> TERMINAR</button></div>
-          <div class="col-25 text-center"><button ng-if="perm[6]" class="button button-success btn-step" ng-click="CAMBIAR_ETAPA('4')"> MOVER A ARMADO</button></div>
-        </div>
-
-        <div class="row row-step">
-          <div class="col-25 text-left"><h5>ARMADO</h5></div>
-          <div class="col-25 text-center"><button ng-if="perm[7]" class="button button-royal btn-step" ng-click="INICIAR('4')"> ASIGNAR</button></div>
-          <div class="col-25 text-center"><button ng-if="perm[8]" class="button button-assertive btn-step" ng-click="TERMINAR('4')"> TERMINAR</button></div>
-          <div class="col-25 text-center"><button ng-if="perm[9]" class="button button-success btn-step" ng-click="CAMBIAR_ETAPA('5')"> MOVER A SOLDADURA</button></div>
+          <div class="col-33 text-left"><h5>CORTE</h5></div>
+          <div class="col-33 text-center"><button ng-if="perm[4]" class="button button-royal btn-step" ng-click="INICIAR('3')"> ASIGNAR</button></div>
+          <div class="col-33 text-center"><button ng-if="perm[5]" class="button button-assertive btn-step" ng-click="TERMINAR('3')"> TERMINAR</button></div>
+          <!--<div class="col-25 text-center"><button ng-if="perm[6]" class="button button-success btn-step" ng-click="CAMBIAR_ETAPA('4')"> MOVER A ARMADO</button></div>-->
         </div>
 
         <div class="row row-step">
-          <div class="col-25 text-left"><h5>SOLDADURA</h5></div>
-          <div class="col-25 text-center"><button ng-if="perm[10]" class="button button-royal btn-step" ng-click="INICIAR('5')"> ASIGNAR</button></div>
-          <div class="col-25 text-center"><button ng-if="perm[11]" class="button button-assertive btn-step" ng-click="TERMINAR('5')"> TERMINAR</button></div>
-          <div class="col-25 text-center"><button ng-if="perm[12]" class="button button-success btn-step" ng-click="CAMBIAR_ETAPA('6')"> MOVER A TERMIN.</button></div>
+          <div class="col-33 text-left"><h5>ARMADO</h5></div>
+          <div class="col-33 text-center"><button ng-if="perm[7]" class="button button-royal btn-step" ng-click="INICIAR('4')"> ASIGNAR</button></div>
+          <div class="col-33 text-center"><button ng-if="perm[8]" class="button button-assertive btn-step" ng-click="TERMINAR('4')"> TERMINAR</button></div>
+          <!--<div class="col-25 text-center"><button ng-if="perm[9]" class="button button-success btn-step" ng-click="CAMBIAR_ETAPA('5')"> MOVER A SOLDADURA</button></div>-->
         </div>
 
         <div class="row row-step">
-          <div class="col-25 text-left"><h5>TERMINACIÓN</h5></div>
-          <div class="col-25 text-center"><button ng-if="perm[13]" class="button button-royal btn-step" ng-click="INICIAR('6')"> ASIGNAR</button></div>
-          <div class="col-25 text-center"><button ng-if="perm[14]" class="button button-assertive btn-step" ng-click="TERMINAR('6')"> TERMINAR</button></div>
-          <div class="col-25 text-center"><button ng-if="perm[15]" class="button button-success btn-step" ng-click="CAMBIAR_ETAPA('7')"> PACKING ENTREGA</button></div>
+          <div class="col-33 text-left"><h5>SOLDADURA</h5></div>
+          <div class="col-33 text-center"><button ng-if="perm[10]" class="button button-royal btn-step" ng-click="INICIAR('5')"> ASIGNAR</button></div>
+          <div class="col-33 text-center"><button ng-if="perm[11]" class="button button-assertive btn-step" ng-click="TERMINAR('5')"> TERMINAR</button></div>
+          <!--<div class="col-25 text-center"><button ng-if="perm[12]" class="button button-success btn-step" ng-click="CAMBIAR_ETAPA('6')"> MOVER A TERMIN.</button></div>-->
+        </div>
+
+        <div class="row row-step">
+          <div class="col-33 text-left"><h5>TERMINACIÓN</h5></div>
+          <div class="col-33 text-center"><button ng-if="perm[13]" class="button button-royal btn-step" ng-click="INICIAR('6')"> ASIGNAR</button></div>
+          <div class="col-33 text-center"><button ng-if="perm[14]" class="button button-assertive btn-step" ng-click="TERMINAR('6')"> TERMINAR</button></div>
+          <!--<div class="col-25 text-center"><button ng-if="perm[15]" class="button button-success btn-step" ng-click="CAMBIAR_ETAPA('7')"> PACKING ENTREGA</button></div>-->
+        </div>
+
+        <div class="row row-step">
+          <div class="col-33 text-left"><h5>ENTREGA</h5></div>
+          <div class="col-67 text-center"><button ng-if="perm[15]" class="button button-balanced btn-step" ng-click="PACKING()"> ARMAR PACKING</button></div>
         </div>
 
       </div>
@@ -58,7 +63,7 @@
   <ion-footer-bar class="bar-assertive">
     <div class="row">
       <div class="col col-67 text-center">
-        <strong>CONECTADO: {{$root.nombre}}</strong>
+        <strong style="font-size: 18px; margin-top:-3px;display:block;">{{$root.nombre}}</strong>
       </div>
       <div class="col col-33 text-center" style="margin-top: -10px;">
         <button class="button button-dark" ng-click="close()">CERRAR CUENTA</button>

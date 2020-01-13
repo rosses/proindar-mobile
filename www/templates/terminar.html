@@ -1,33 +1,65 @@
-<ion-view view-title="TERMINO DE {{stepName}}" cache-view="false">
+<ion-view view-title="{{buttonName}} DE {{stepName}}" cache-view="false">
   <ion-content scroll="false" class="home" on-swipe-right="onSwipeRight($event)" on-swipe-left="onSwipeLeft($event)">
-    <div>
-      <div class="header" ng-if="packet.length > 0">
-        <div style='font-size:18px; font-weight:bold;'>OT {{packet[0].OT}}</div>
-        <b>{{packet[0].cardname}}</b><br />
+    <div ng-hide="ot">
+      <center>
+        <h3><br /><br />{{buttonName}} de {{stepName}}<br /><br />Escanee un código de OT<br />o escanea una pieza</h3>
+      </center>
+    </div>
+    <div ng-hide="!ot">
+      <div class="header">
+        <div class="row">
+          <div class="col-67">
+            <div style='font-size:18px; font-weight:bold;'>OT {{ot.ot}}-{{ot.corr}}</div>
+            <b>{{ot.cardname}}</b><br />
+            <div class="paquete">{{getSelected()}} para terminar de {{ot.pieces.length}}</div> 
+          </div>
+          <div class="col-33 text-right">
+            <button class="button button-balanced button-small" ng-if="enableOp && ot.pieces.length > 0" ng-click="marcarTodo()">TODO</button>
+            <button class="button button-assertive button-small" ng-if="enableOp && ot.pieces.length > 0" ng-click="desmarcarTodo()">NADA</button>
+          </div>
+        </div>
+      </div>
+      <!--<ion-checkbox ng-model="add.moving">{{nextName}}</ion-checkbox>-->
+      <div class="proindar-tab">
+        <div class="proindar-tab-2">
+          <div class="proindar-in" ng-click="changeTab('people')" ng-class="{sel: activeTab == 'people'}">Por responsable</div>
+        </div><div class="proindar-tab-2">
+          <div class="proindar-in" ng-click="changeTab('all')" ng-class="{sel: activeTab == 'all'}">Todas</div>
+        </div>
       </div>
 
-      <ion-scroll direction="y" style="height: calc(100vh - 250px)">
-         
-        <h5 style='color:red; text-align:center;' ng-if="packet.length == 0">NO HAY PIEZAS<br />ESCANEA UN CODIGO PARA EMPEZAR</h5>
-        <br /> 
-        <div class="" style="display:inline-block; width:100%; margin-right: 20px; font-size: 25px; margin-bottom: 10px;" ng-repeat="linea in packet">
-          <div class="row">
-            <div class="col-100 conteo-articulo" style="width:100%;">
-              <button ng-click="borrar(linea.internalcode)" class="button button-assertive button-derecha">borrar</button>
-              <span>{{linea.internalcode}}</span><br /><i>Marca: <b>{{linea.mark}}</b><br />{{linea.totalkg}} kgs - {{linea.dimtype}}</i><br />{{linea.employee}}
-            </div> 
+      <ion-scroll direction="y" class="piece_container">
+        <div ng-hide="activeTab == 'all'">
+          <div ng-repeat="grupo in groupPeople()" class="piece-group">
+            <div class="piece-title">
+              <div class="row">
+                <div class="col-67">{{grupo}}</div>
+                <div class="col-33 text-right">
+                  <button class="button button-balanced button-small" ng-if="enableOp && ot.pieces.length > 0" ng-click="changeTodoGrupo('people',grupo,true)">TODO</button>
+                  <button class="button button-assertive button-small" ng-if="enableOp && ot.pieces.length > 0" ng-click="changeTodoGrupo('people',grupo,false)">NADA</button>
+                </div>
+              </div>
+            </div>
+            <div class="piece" ng-click="piece.selected = !piece.selected" ng-repeat="piece in groupPeoplePiece(grupo)" ng-class="{on: piece.selected}">
+              {{piece.mark}} / {{piece.corr}}
+            </div>
+          </div> 
+        </div>
+        <div ng-hide="activeTab == 'people'">
+          <div class="piece" ng-click="piece.selected = !piece.selected" ng-repeat="piece in ot.pieces" ng-class="{on: piece.selected}">
+            {{piece.mark}} / {{piece.corr}}
           </div>
-          
-        </div> 
+        </div>
       </ion-scroll>
+
     </div>
 
   </ion-content>
   <ion-footer-bar class="bar-stable">
     <div class="row">
       <div class="col col-100 text-center" style="margin-top: -10px;">
-        <button class="button button-dark" ng-click="cancelarInicio()">CANCELAR</button>
-        <button class="button button-assertive button-small" ng-if="packet.length > 0" ng-click="prepareInicio()">{{buttonName}}</button>
+        <button class="button button-dark" ng-click="cancelarTermino()">CANCELAR</button>
+        <button class="button button-assertive button-small" ng-if="getSelected() > 0" ng-click="prepareInicio()">{{buttonName}}</button>
       </div>
     </div>    
   </ion-footer-bar>
