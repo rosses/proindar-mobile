@@ -1,0 +1,8 @@
+<ion-modal-view>
+<ion-header-bar class="bar-assertive">
+  <h1 class="title">MOTIVO RECHAZO</h1>
+</ion-header-bar>
+<ion-content style="padding:15px; text-align:center;" class="modallle">
+	<ion-radio class="proindar-nowrap" ng-model="activeRow.code" ng-click="clickCode(r.code)" ng-value="r.code" ng-repeat="r in rejects">{{r.code}} - {{r.description}}</ion-radio>
+</ion-content>
+</ion-modal-view>

@@ -46,6 +46,7 @@ angular.module('andes.controllers').controller('SelectorCtrl',
 
   $scope.close = function() {
     localStorage.removeItem('user');
+    $scope.perm = [false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false];
     $scope.modoEscaner = 'login';
     $scope.modalConfiguracion.show();    
   }

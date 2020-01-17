@@ -163,7 +163,7 @@ angular.module('andes.controllers').controller('TerminarCtrl', function($scope, 
       });
     }
     else if ($stateParams.step == "6") {
-      $rootScope.confirmar("Desea generar la liberación?", function() {
+      $rootScope.confirmar("Dejar disponible para packing list?", function() {
         $scope.confirmada();
       });
     }

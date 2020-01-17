@@ -27,6 +27,7 @@ angular.module('andes.controllers').controller('AsignarCtrl', function($scope, $
     if ($stateParams.step == "4") { $scope.stepName = "ARMADO"; $scope.activeTab = 'lote_internal'; }
     if ($stateParams.step == "5") { $scope.stepName = "SOLDADURA"; $scope.activeTab = 'lote_internal'; }
     if ($stateParams.step == "6") { $scope.stepName = "TERMINACIÓN"; $scope.activeTab = 'lote_internal'; }
+    if ($stateParams.step == "7") { $scope.stepName = "PACKING LIST"; $scope.activeTab = 'lote_internal'; }
   }
 
 
@@ -200,14 +201,22 @@ angular.module('andes.controllers').controller('AsignarCtrl', function($scope, $
   }
 
   $scope.prepareInicio = function() {
-    $scope.ejecutores = [];
-    $rootScope.showload();
-    //$scope.modoEscaner = "persona";
-    jQuery.post(app.rest+"ajax.mobile.data.php&a=employee", {step: $stateParams.step}, function(data) {
-      $scope.ejecutores = data;
-      $rootScope.hideload();
-      $scope.modalInicio.show();
-    },"json");
+    if ($stateParams.step == "7") { 
+      $rootScope.confirmar("¿Generar PACKING LIST con "+$scope.getSelected()+" piezas?", function() {
+        $scope.confirmada();
+      });
+    }
+    else {
+      $scope.ejecutores = [];
+      $rootScope.showload();
+      //$scope.modoEscaner = "persona";
+      jQuery.post(app.rest+"ajax.mobile.data.php&a=employee", {step: $stateParams.step}, function(data) {
+        $scope.ejecutores = data;
+        $rootScope.hideload();
+        $scope.modalInicio.show();
+      },"json");      
+    }
+
   }
 
   //$scope.setejecutor = function(x) { $scope.ejecutor = x; }

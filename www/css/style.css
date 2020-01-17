@@ -479,6 +479,10 @@ ul.the_i_segment[proindar] li:last-child.active {
 	color:white;
 	background-color:green;
 }
+.piece.died {
+	color:white;
+	background-color:red;	
+}
 .button-balanced {
 	background-color:green !important;
 }
@@ -549,3 +553,21 @@ ul.the_i_segment[proindar] li:last-child.active {
 	background-color: #b6ffbd;
 	font-weight: bold;
 }
+@-webkit-keyframes flashme {
+    0% {
+        background-color: #efff47;
+        opacity:1;
+    } 
+    77% {
+        background-color: #faffc5;
+    }
+    100% {
+        background-color: #FFF;
+    }
+}
+.flashme {
+    -webkit-animation-name: flashme;
+    -webkit-animation-duration: 900ms;
+    -webkit-animation-iteration-count: 1;
+    -webkit-animation-timing-function: ease-in-out;
+}  

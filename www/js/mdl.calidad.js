@@ -9,198 +9,193 @@ angular.module('andes.controllers').controller('CalidadCtrl', function($scope, $
       $state.go('main.selector');
     }, 100
   );
-  $scope.modalSteper = null;
   $scope.$on('$destroy', deregisterFirst);
 
-  $scope.stepName = '';
+  $scope.modalRechazo = null;
+  $scope.activeRow = { code: '', index: null };
   $scope.modoEscaner = 'leer';
-  $scope.packet = [];
-  $scope.ejecutor = ""; 
+  $scope.rejects = [];
 
   //if ($stateParams.step == "7") { $scope.stepName = "CALIDAD"; }
   $scope.setStep = function(sx) {
     $stateParams.metodo = sx;
-    if ($stateParams.metodo == "allow") { $scope.stepName = "APROBAR"; }
-    if ($stateParams.metodo == "reject") { $scope.stepName = "RECHAZAR"; } 
+    //if ($stateParams.metodo == "allow") { $scope.stepName = "APROBAR"; }
+    //if ($stateParams.metodo == "reject") { $scope.stepName = "RECHAZAR"; } 
   }
-
-  $scope.etapaOK = function() {
-    $scope.modalSteper.hide();
-  };
 
   $scope.$on('$ionicView.enter', function(obj, viewData){
     if (viewData.direction == 'back') {
-      $scope.popCloseable = null;
+      $scope.modalRechazo = null;
+      $scope.activeRow = { code: '', index: null };
       $scope.modoEscaner = 'leer';
-      $scope.packet = [];
-      $scope.ejecutor = "";
+      $scope.rejects = [];
     }
-    $scope.setStep('allow');
   });
 
-    if ($stateParams.metodo == "allow") { $scope.stepName = "APROBAR"; }
-    if ($stateParams.metodo == "reject") { $scope.stepName = "RECHAZAR"; } 
-
-
   $scope.$on('$ionicView.beforeLeave', function(obj, viewData){
-    $scope.popCloseable = null;
+    $scope.modalRechazo = null;
+    $scope.activeRow = { code: '', index: null };
     $scope.modoEscaner = 'leer';
-    $scope.packet = [];
-    $scope.ejecutor = ""; 
+    $scope.rejects = [];
   }); 
 
   $scope.cancelar = function() {
-    $scope.popCloseable = null;
+    $scope.modalRechazo = null;
+    $scope.activeRow = { code: '', index: null };
     $scope.modoEscaner = 'leer';
-    $scope.packet = [];
-    $scope.ejecutor = "";
+    $scope.rejects = [];
   }
-  $scope.borrar = function (IdPieza) {
-    for (var i = 0; i < $scope.packet.length; i++) {
-      if ($scope.packet[i].internalcode == IdPieza) {
-        $scope.packet.splice(i, 1);
-        break;
+
+  $scope.getSelected = function() {
+    var t = 0;
+    if ($scope.packing) {
+      for (var i = 0; i < $scope.packing.pieces.length; i++) {
+        if ($scope.packing.pieces[i].allowed != 0) {
+          t++;
+        }
       }
     }
-  };
+    return t;
+  } 
 
+  $scope.intercalateCalidad = function(idx) {
+    if ($scope.packing.pieces[idx].allowed == 0) {
+      $scope.packing.pieces[idx].allowed = 1;
+    }
+    else if ($scope.packing.pieces[idx].allowed == 1) {
+      $scope.packing.pieces[idx].allowed = -1;
+    }
+    else if ($scope.packing.pieces[idx].allowed == -1) {
+      $scope.packing.pieces[idx].allowed = 0;
+    }
+  }
   $scope.$on('scanner', function(event, args) {
     if ($scope.modoEscaner == "leer") {
       $rootScope.showload();
-      jQuery.post(app.rest+"ajax.mobile.data.php&a=moving", { 
+      jQuery.post(app.rest+"ajax.mobile.data.php&a=packing", { 
         barra: args.barcode, 
-        autor: localStorage.getItem('user'),
-        to: $stateParams.step,
-        action: "quality"
+        autor: localStorage.getItem('user')
       }, function(data) {
         $rootScope.hideload();
         $rootScope.$apply();
         if (data.error) {
           $rootScope.err(data.error);
+          playerror();
           return;
         }
-        if ($scope.packet.length > 0 && $scope.packet[0].OT!=data.OT) {
-          $rootScope.err("Pieza no corresponde a OT en trabajo");
-          return;
+        $scope.packing = data;
+        for (var i = 0; i < $scope.packing.pieces.length; i++) {
+          $scope.packing.pieces[i].allowed = 0;
+          $scope.packing.pieces[i].code = "";
+          $scope.packing.pieces[i].flashme = 0;
         }
-        var found = 0;
-        for (var i = 0; i < $scope.packet.length; i++) {
-          if ($scope.packet[i].internalcode == data.internalcode) {
-            $rootScope.err("Pieza ya existe en esta gestión");
-            found = 1;
-            break;
-          }
-        }
-        if (found == 1) {
-          return;
-        }
-        
-        if (found == 0) {
-          data.dimtype = data.dimtype.replace("peldano","Peldaño");
-          $scope.packet.push({
-            internalcode: data.internalcode,
-            mark: data.mark,
-            dimtype: data.dimtype.charAt(0).toUpperCase() + data.dimtype.slice(1),
-            cardname: data.cardname,
-            OT: data.OT,
-            totalkg: parseFloat(data.totalkg),
-            employee: data.employee
-          });
-        } 
-        
-        
+        $scope.modoEscaner = 'buscar';
         $scope.$broadcast('scroll.resize');
         $rootScope.$apply();
       },"json");
 
     }
+    else if ($scope.modoEscaner == "buscar") {
+      var found = 0;
+      for (var i = 0; i < $scope.packing.pieces.length ; i++) {
+        //console.log($scope.packing.pieces[i].internalcode, args.barcode);
+        if ($scope.packing.pieces[i].internalcode == args.barcode) {
+          $scope.packing.pieces[i].flashme = 1;
+          //console.log('flash '+i);
+          setTimeout(function() {
+            //$scope.packing.pieces[i].flashme = false;
+            //console.log('unflash '+i);
+          }, 1000);
+          found = 1;
+          //$scope.$broadcast('scroll.resize');
+          $rootScope.$apply();
+          break;
+        } 
+      }
+      if (found == 0) {
+        $rootScope.err("Pieza no encontrada en este packing");
+        playerror();
+      }
+    }
 
   });
 
-  $scope.modalInicio = null;
-  $scope.ejecutor = "";
-  $scope.ejecutores = [];
+  $scope.rechazoCode = function(code, index) {
+      $scope.activeRow.code = code;
+      $scope.activeRow.index = index;
+      $rootScope.showload();
+      jQuery.post(app.rest+"ajax.mobile.data.php&a=rejects", { 
+        
+      }, function(data) {
+        $scope.rejects = data;
+        $rootScope.hideload();
+        $scope.modalRechazo.show();
+      },"json");
+  };
+  $scope.clickCode = function(code) {
+    $scope.packing.pieces[$scope.activeRow.index].code = code;
+    $scope.modalRechazo.hide();
+  };
 
-  $ionicModal.fromTemplateUrl('templates/modal_emp_inicio.html', {
+  $ionicModal.fromTemplateUrl('templates/modal_rechazos.html', {
     scope: $scope,
     animation: 'slide-in-up'
   }).then(function(modal) {
-    $scope.modalInicio = modal;
-  });
-  $scope.closeSalida = function() {
-    $scope.modalInicio.hide();
-  }
-  $scope.prepareInicio = function() {
-    if ($scope.packet.length == 0) {
-      $rootScope.err("movimiento vacio");
+    $scope.modalRechazo = modal;
+  }); 
+  
+  $scope.procesar = function() {
+    var items = [];
+    for (var i = 0;i < $scope.packing.pieces.length; i++) {
+      if ($scope.packing.pieces[i].allowed != 0) {
+        items.push({
+          internalcode: $scope.packing.pieces[i].internalcode,
+          allowed: $scope.packing.pieces[i].allowed,
+          code: $scope.packing.pieces[i].code
+        });
+      }
+    }
+    if (items.length > 0) {
+      $rootScope.confirmar("Procesar "+$scope.getSelected()+" de "+$scope.packing.pieces.length+" piezas?", function() { 
+        $rootScope.showload();
+        jQuery.post(app.rest+"ajax.mobile.data.php&a=calidad", {
+          autor: localStorage.getItem('user'),
+          items: items
+        }, function(data) {
+          $rootScope.hideload();
+          if (data.error) {
+            $rootScope.err(data.error);
+          }
+          else {
+            $scope.packing = null;
+            $scope.modoEscaner = 'leer';
+            $rootScope.ok(data.msg);
+          }        
+        },"json");
+      });
     }
     else {
-      if ($scope.stepName == "APROBAR") {
-        $rootScope.confirmar("Va a generar una recepción conforme, está seguro?", function() {
-          $scope.confirmada();
-        });
-      }
-      else {
-        $rootScope.confirmar("Va a rechazar, está seguro?", function() {
-          $scope.rechazada();
-        });
-      }
+      $rootScope.err("Nada que procesar");
     }
-  }
-
-  $scope.setejecutor = function(x) { $scope.ejecutor = x; }
-
-  $scope.rechazada = function() {
-    $rootScope.showload();
-    jQuery.post(app.rest+"ajax.mobile.data.php&a=trx_rechaza", {
-      ejecutor: $scope.ejecutor,
-      items: $scope.packet, 
-      autor: localStorage.getItem('user'),
-      to: 8,
-      ot: $scope.packet[0].OT
-    }, function(data) {
-      $rootScope.hideload();
-      if (data.error) {
-        $rootScope.err(data.error);
-      }
-      else {
-        $scope.packet = [];
-        $scope.modalInicio.hide();
-        $rootScope.ok(data.msg);
-      }        
-    },"json");
-  }
-  $scope.confirmada = function() {
-
-    $rootScope.showload();
-    jQuery.post(app.rest+"ajax.mobile.data.php&a=trx_mover", {
-      ejecutor: $scope.ejecutor,
-      items: $scope.packet, 
-      autor: localStorage.getItem('user'),
-      to: 8,
-      ot: $scope.packet[0].OT
-    }, function(data) {
-      $rootScope.hideload();
-      if (data.error) {
-        $rootScope.err(data.error);
-      }
-      else {
-        $scope.packet = [];
-        $scope.modalInicio.hide();
-        $rootScope.ok(data.msg);
-      }        
-    },"json");
- 
   };
-  $scope.cancelarInicio = function() {
-    $rootScope.confirmar("Salir?", function() {
-      $ionicHistory.clearCache();
-      $ionicHistory.nextViewOptions({
-          historyRoot: true
+  
+  $scope.cancelar = function() {
+    if ($scope.packing) {
+      $rootScope.confirmar("Salir?", function() {
+        $ionicHistory.clearCache();
+        $ionicHistory.nextViewOptions({
+            historyRoot: true
+        });
+        $state.go('main.selector');
+      }, function() {
       });
-      $state.go('main.selector');
-    }, function() {
-    });
-
+    }
+    else {
+        $ionicHistory.clearCache();
+        $ionicHistory.nextViewOptions({
+            historyRoot: true
+        });
+        $state.go('main.selector');
+    }
   }
 })

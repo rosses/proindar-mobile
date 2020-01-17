@@ -48,14 +48,13 @@
 
         <div class="row row-step">
           <div class="col-33 text-left"><h5>ENTREGA</h5></div>
-          <div class="col-67 text-center"><button ng-if="perm[15]" class="button button-balanced btn-step" ng-click="PACKING()"> ARMAR PACKING</button></div>
+          <div class="col-67 text-center"><button ng-if="perm[15]" class="button button-balanced btn-step" ng-click="INICIAR('7')"> ARMAR PACKING</button></div>
         </div>
 
       </div>
       <div ng-if="perm[16]">
         <h2>CALIDAD</h2>
-        <button ng-if="perm[16]" class="button button-success" ng-click="CALIDAD('allow')"> LIBERAR</button>
-        <button ng-if="perm[16]" class="button button-assertive" ng-click="CALIDAD('reject')"> RECHAZAR</button>
+        <button ng-if="perm[16]" class="button button-success" ng-click="CALIDAD('allow')"> GESTIONAR PACKING</button>
         <br /><br />
       </div>
     </div>
