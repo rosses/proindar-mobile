@@ -24,9 +24,9 @@
         <div class="col-33"><b>Código rechazo</b></div>
       </div>
       <ion-scroll direction="y" style="height: calc(100vh - 150px)">
-        <div ng-repeat="piece in packing.pieces" class="piece-group row" ng-class="{flashme: piece.flashme == 1}">
+        <div ng-repeat="piece in packing.pieces" style="margin-bottom: 8px;" class="piece-group row" ng-class="{flashme: piece.flashme == 1}">
           <div class="col-67">
-            <div class="piece" style="min-width:80%;" ng-click="intercalateCalidad($index)" ng-class="{on: piece.allowed == 1, died: piece.allowed == -1}">
+            <div class="piece" style="min-width:80%; font-size: 15px; padding:8px;" ng-click="intercalateCalidad($index)" ng-class="{on: piece.allowed == 1, died: piece.allowed == -1}">
               {{piece.mark}} / {{piece.corr}}
             </div>
           </div>

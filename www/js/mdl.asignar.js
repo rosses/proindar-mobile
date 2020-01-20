@@ -3,6 +3,7 @@ angular.module('andes.controllers').controller('AsignarCtrl', function($scope, $
 
   var deregisterFirst = $ionicPlatform.registerBackButtonAction(
     function() {
+      $scope.modoEscaner = "pieza";
       $ionicHistory.nextViewOptions({
           historyRoot: true
       });
@@ -130,6 +131,24 @@ angular.module('andes.controllers').controller('AsignarCtrl', function($scope, $
         playerror();
       }
     } 
+    else if ($scope.modoEscaner == "persona") {
+      var str = args.barcode.split('|');
+      if (str.length == 3) {
+        var eid = str[1];
+        for (var x = 0; x < $scope.ejecutores.length; x++) {
+          if ($scope.ejecutores[x].id == eid) {
+            $scope.ejecutor.id = eid;
+            $scope.confirmada();
+            break;
+          }
+        }
+      } 
+      else {
+        $rootScope.err("Credencial de colaborador no existe");
+        playerror();
+      }
+
+    } 
   });
   $scope.groupMarca = function() {
     var g = [];
@@ -197,7 +216,7 @@ angular.module('andes.controllers').controller('AsignarCtrl', function($scope, $
 
   $scope.closeSalida = function() {
     $scope.modalInicio.hide();
-    //$scope.modoEscaner = "pieza";
+    $scope.modoEscaner = "pieza";
   }
 
   $scope.prepareInicio = function() {
@@ -209,9 +228,10 @@ angular.module('andes.controllers').controller('AsignarCtrl', function($scope, $
     else {
       $scope.ejecutores = [];
       $rootScope.showload();
-      //$scope.modoEscaner = "persona";
+      
       jQuery.post(app.rest+"ajax.mobile.data.php&a=employee", {step: $stateParams.step}, function(data) {
         $scope.ejecutores = data;
+        $scope.modoEscaner = "persona";
         $rootScope.hideload();
         $scope.modalInicio.show();
       },"json");      

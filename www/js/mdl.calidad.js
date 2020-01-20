@@ -57,7 +57,13 @@ angular.module('andes.controllers').controller('CalidadCtrl', function($scope, $
     }
     return t;
   } 
-
+  $scope.marcarOkTodo = function() {
+    if ($scope.packing) {
+      for (var i = 0; i < $scope.packing.pieces.length; i++) {
+        $scope.packing.pieces[i].allowed = 1;
+      }
+    }
+  };
   $scope.intercalateCalidad = function(idx) {
     if ($scope.packing.pieces[idx].allowed == 0) {
       $scope.packing.pieces[idx].allowed = 1;
