@@ -172,7 +172,12 @@ angular.module('andes.controllers').controller('ValeCtrl', function($scope, $sta
           $scope.enableOp = false;
           $scope.modalSalida.hide();
         }        
-      },"json");
+      },"json").fail(function(){
+          $rootScope.ok("Proceso realizado");
+          $scope.vale = null;
+          $scope.enableOp = false;
+          $scope.modalSalida.hide();
+      });
 
 
     });
