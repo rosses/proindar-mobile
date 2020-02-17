@@ -1,6 +1,6 @@
 app = {
-  rest:  "http://proindar.enlanube.cl/require/load.php?call="
-  //rest:  "http://proindar.test/require/load.php?call="
+  //rest:  "http://proindar.enlanube.cl/require/load.php?call="
+  rest:  "http://proindar.test/require/load.php?call="
 };
 
 angular.module('andes', ['ionic', 'andes.controllers','ngStorage','peanuthub-custom-keyboard', 'plgn.ionic-segment'])

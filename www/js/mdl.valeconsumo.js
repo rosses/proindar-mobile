@@ -73,7 +73,7 @@ angular.module('andes.controllers').controller('ValeCtrl', function($scope, $sta
         }
 
         for (var i = 0; i < data.items.length; i++) {
-          data.items[i].parcial = 0;
+          data.items[i].parcial = data.items[i].pending;
         }
         $scope.enableOp = true;
         $scope.vale = data;
@@ -178,13 +178,21 @@ angular.module('andes.controllers').controller('ValeCtrl', function($scope, $sta
     });
   };
   $scope.cancelarValeConsumo = function() {
-    $rootScope.confirmar("Anular captura del vale de consumo?", function() {
+    if ($scope.vale != null) {
+      $rootScope.confirmar("Anular captura del vale de consumo?", function() {
+        $ionicHistory.nextViewOptions({
+            historyRoot: true
+        });
+        $state.go('main.selector');
+      }, function() {
+      });
+    } else {
       $ionicHistory.nextViewOptions({
           historyRoot: true
       });
       $state.go('main.selector');
-    }, function() {
-    });
+    }
+
   }
   $scope.moveParcial = function(index,variation) {
     var p = parseFloat($scope.vale.items[index].parcial);
