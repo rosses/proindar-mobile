@@ -13,7 +13,7 @@ angular.module('andes.controllers').controller('CalidadCtrl', function($scope, $
 
   $scope.modalRechazo = null;
   $scope.activeRow = { code: '', index: null };
-  $scope.modoEscaner = 'leer';
+  $rootScope.modoEscaner = 'leer';
   $scope.rejects = [];
 
   //if ($stateParams.step == "7") { $scope.stepName = "CALIDAD"; }
@@ -27,7 +27,7 @@ angular.module('andes.controllers').controller('CalidadCtrl', function($scope, $
     if (viewData.direction == 'back') {
       $scope.modalRechazo = null;
       $scope.activeRow = { code: '', index: null };
-      $scope.modoEscaner = 'leer';
+      $rootScope.modoEscaner = 'leer';
       $scope.rejects = [];
     }
   });
@@ -35,14 +35,14 @@ angular.module('andes.controllers').controller('CalidadCtrl', function($scope, $
   $scope.$on('$ionicView.beforeLeave', function(obj, viewData){
     $scope.modalRechazo = null;
     $scope.activeRow = { code: '', index: null };
-    $scope.modoEscaner = 'leer';
+    $rootScope.modoEscaner = 'leer';
     $scope.rejects = [];
   }); 
 
   $scope.cancelar = function() {
     $scope.modalRechazo = null;
     $scope.activeRow = { code: '', index: null };
-    $scope.modoEscaner = 'leer';
+    $rootScope.modoEscaner = 'leer';
     $scope.rejects = [];
   }
 
@@ -76,7 +76,7 @@ angular.module('andes.controllers').controller('CalidadCtrl', function($scope, $
     }
   }
   $scope.$on('scanner', function(event, args) {
-    if ($scope.modoEscaner == "leer") {
+    if ($rootScope.modoEscaner == "leer") {
       $rootScope.showload();
       jQuery.post(app.rest+"ajax.mobile.data.php&a=packing", { 
         barra: args.barcode, 
@@ -95,13 +95,13 @@ angular.module('andes.controllers').controller('CalidadCtrl', function($scope, $
           $scope.packing.pieces[i].code = "";
           $scope.packing.pieces[i].flashme = 0;
         }
-        $scope.modoEscaner = 'buscar';
+        $rootScope.modoEscaner = 'buscar';
         $scope.$broadcast('scroll.resize');
         $rootScope.$apply();
       },"json");
 
     }
-    else if ($scope.modoEscaner == "buscar") {
+    else if ($rootScope.modoEscaner == "buscar") {
       var found = 0;
       for (var i = 0; i < $scope.packing.pieces.length ; i++) {
         //console.log($scope.packing.pieces[i].internalcode, args.barcode);
@@ -174,7 +174,7 @@ angular.module('andes.controllers').controller('CalidadCtrl', function($scope, $
           }
           else {
             $scope.packing = null;
-            $scope.modoEscaner = 'leer';
+            $rootScope.modoEscaner = 'leer';
             $rootScope.ok(data.msg);
           }        
         },"json");

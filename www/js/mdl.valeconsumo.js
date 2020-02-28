@@ -13,7 +13,7 @@ angular.module('andes.controllers').controller('ValeCtrl', function($scope, $sta
   $scope.warehouse = $stateParams.warehouse;
   $scope.popCloseable = null;
   $rootScope.barra = '';
-  $scope.modoEscaner = 'leer';
+  $rootScope.modoEscaner = 'leer';
   $scope.enableOp = false;
   $scope.inventory = [];
   $scope.conteo = 0;
@@ -26,7 +26,7 @@ angular.module('andes.controllers').controller('ValeCtrl', function($scope, $sta
     if (viewData.direction == 'back') {
       $scope.popCloseable = null;
       $rootScope.barra = '';
-      $scope.modoEscaner = 'leer';
+      $rootScope.modoEscaner = 'leer';
       $scope.enableOp = false;
       $scope.vale = null;
       $scope.receptor = "";
@@ -37,7 +37,7 @@ angular.module('andes.controllers').controller('ValeCtrl', function($scope, $sta
   $scope.$on('$ionicView.beforeLeave', function(obj, viewData){
     $scope.popCloseable = null;
     $rootScope.barra = '';
-    $scope.modoEscaner = 'leer';
+    $rootScope.modoEscaner = 'leer';
     $scope.enableOp = false;
     $scope.vale = null;
     $scope.receptor = "";
@@ -47,7 +47,7 @@ angular.module('andes.controllers').controller('ValeCtrl', function($scope, $sta
   $scope.cancelar = function() {
     $scope.popCloseable = null;
     $scope.barra = '';
-    $scope.modoEscaner = 'leer';
+    $rootScope.modoEscaner = 'leer';
     $scope.enableOp = false;
     $scope.vale = null;
     $scope.receptor = "";
@@ -63,7 +63,7 @@ angular.module('andes.controllers').controller('ValeCtrl', function($scope, $sta
   };
 
   $scope.$on('scanner', function(event, args) {
-    if ($scope.modoEscaner == "leer") {
+    if ($rootScope.modoEscaner == "leer") {
       $rootScope.showload();
       jQuery.post(app.rest+"ajax.mobile.data.php&a=VC", { barra: args.barcode }, function(data) {
         $rootScope.hideload();
@@ -78,12 +78,12 @@ angular.module('andes.controllers').controller('ValeCtrl', function($scope, $sta
         $scope.enableOp = true;
         $scope.vale = data;
 
-        $scope.modoEscaner = "producto";
+        $rootScope.modoEscaner = "producto";
         $scope.$broadcast('scroll.resize');
         $rootScope.$apply();
        
       },"json").fail(function(err) {
-        $scope.modoEscaner = "leer";
+        $rootScope.modoEscaner = "leer";
         $rootScope.hideload(); 
         $rootScope.$apply();
         $rootScope.err(err.error);

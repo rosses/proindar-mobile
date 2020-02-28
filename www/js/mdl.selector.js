@@ -1,11 +1,11 @@
 angular.module('andes.controllers').controller('SelectorCtrl', 
- function($scope, $state, $localStorage, $timeout, $interval, $ionicPopup, $ionicModal, $rootScope, $location, $ionicLoading, $ionicHistory) {
+ function($scope, $state, $localStorage, $timeout, $interval, $rootScope, $ionicPopup, $ionicModal, $rootScope, $location, $ionicLoading, $ionicHistory) {
 
   $scope.modalConfiguracion = null;
   $rootScope.enInicio = 1;
 
   $scope.perm = [false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false];
-  $scope.modoEscaner = '';
+  $rootScope.modoEscaner = '';
 
   $ionicModal.fromTemplateUrl('templates/config.html', {
     scope: $scope,
@@ -16,7 +16,7 @@ angular.module('andes.controllers').controller('SelectorCtrl',
 
   $scope.$on('scanner', function(event, args) {
     console.log('selectorCtrl::scanner', args);
-    if ($scope.modoEscaner == "login") {
+    if ($rootScope.modoEscaner == "login") {
       $rootScope.showload();
       jQuery.post(app.rest+"ajax.mobile.login.php", { credential: args.barcode }, function(data) {
         $rootScope.hideload();
@@ -31,7 +31,7 @@ angular.module('andes.controllers').controller('SelectorCtrl',
           for (var i = 0; i < data.perm.length; i++) {
             $scope.perm[parseInt(data.perm[i].perm_id)] = true;
           }
-          $scope.modoEscaner = ''; 
+          $rootScope.modoEscaner = ''; 
           $scope.modalConfiguracion.hide();
         }
         $rootScope.$apply();       
@@ -47,13 +47,13 @@ angular.module('andes.controllers').controller('SelectorCtrl',
   $scope.close = function() {
     localStorage.removeItem('user');
     $scope.perm = [false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false];
-    $scope.modoEscaner = 'login';
+    $rootScope.modoEscaner = 'login';
     $scope.modalConfiguracion.show();    
   }
   
   $scope.start = function(x) {
     setTimeout(function() {
-      $scope.modoEscaner = 'login';
+      $rootScope.modoEscaner = 'login';
       $scope.modalConfiguracion.show();
     },500);
   }

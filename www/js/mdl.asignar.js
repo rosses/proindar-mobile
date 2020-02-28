@@ -3,7 +3,7 @@ angular.module('andes.controllers').controller('AsignarCtrl', function($scope, $
 
   var deregisterFirst = $ionicPlatform.registerBackButtonAction(
     function() {
-      $scope.modoEscaner = "pieza";
+      $rootScope.modoEscaner = "pieza";
       $ionicHistory.nextViewOptions({
           historyRoot: true
       });
@@ -16,7 +16,7 @@ angular.module('andes.controllers').controller('AsignarCtrl', function($scope, $
   $scope.activeTab = '';
   $scope.ot = null;
   $scope.enableOp = false;
-  $scope.modoEscaner = 'leer'; 
+  $rootScope.modoEscaner = 'leer'; 
   $scope.popCloseable = null;
   $scope.ejecutores = [];
   $scope.ejecutor = {id: ''};
@@ -38,7 +38,7 @@ angular.module('andes.controllers').controller('AsignarCtrl', function($scope, $
       $scope.activeTab = '';
       $scope.ot = null;
       $scope.enableOp = false;
-      $scope.modoEscaner = 'leer'; 
+      $rootScope.modoEscaner = 'leer'; 
       $scope.popCloseable = null;
       $scope.ejecutores = [];
       $scope.ejecutor = {id: ''};
@@ -53,7 +53,7 @@ angular.module('andes.controllers').controller('AsignarCtrl', function($scope, $
     $scope.activeTab = '';
     $scope.ot = null;
     $scope.enableOp = false;
-    $scope.modoEscaner = 'leer'; 
+    $rootScope.modoEscaner = 'leer'; 
     $scope.popCloseable = null;
     $scope.ejecutores = [];
     $scope.ejecutor = {id: ''};
@@ -83,7 +83,7 @@ angular.module('andes.controllers').controller('AsignarCtrl', function($scope, $
   } 
 
   $scope.$on('scanner', function(event, args) {
-    if ($scope.modoEscaner == "leer") {
+    if ($rootScope.modoEscaner == "leer") {
       $rootScope.showload();
       jQuery.post(app.rest+"ajax.mobile.data.php&a=ot&find=step&for_step="+($stateParams.step), { barra: args.barcode }, function(data) {
         $rootScope.hideload();
@@ -112,12 +112,12 @@ angular.module('andes.controllers').controller('AsignarCtrl', function($scope, $
           playerror();
         }
         $scope.enableOp = true;
-        $scope.modoEscaner = "pieza";
+        $rootScope.modoEscaner = "pieza";
         $scope.$broadcast('scroll.resize');
         $rootScope.$apply(); 
       },"json");
     }
-    else if ($scope.modoEscaner == "pieza") {
+    else if ($rootScope.modoEscaner == "pieza") {
       var found = 0;
       for (var i = 0; i < $scope.ot.pieces.length; i++) {
         if ($scope.ot.pieces[i].internalcode == args.barcode) {
@@ -131,7 +131,7 @@ angular.module('andes.controllers').controller('AsignarCtrl', function($scope, $
         playerror();
       }
     } 
-    else if ($scope.modoEscaner == "persona") {
+    else if ($rootScope.modoEscaner == "persona") {
       var str = args.barcode.split('|');
       if (str.length == 3) {
         var eid = str[1];
@@ -216,7 +216,7 @@ angular.module('andes.controllers').controller('AsignarCtrl', function($scope, $
 
   $scope.closeSalida = function() {
     $scope.modalInicio.hide();
-    $scope.modoEscaner = "pieza";
+    $rootScope.modoEscaner = "pieza";
   }
 
   $scope.prepareInicio = function() {
@@ -231,7 +231,7 @@ angular.module('andes.controllers').controller('AsignarCtrl', function($scope, $
       
       jQuery.post(app.rest+"ajax.mobile.data.php&a=employee", {step: $stateParams.step}, function(data) {
         $scope.ejecutores = data;
-        $scope.modoEscaner = "persona";
+        $rootScope.modoEscaner = "persona";
         $rootScope.hideload();
         $scope.modalInicio.show();
       },"json");      
@@ -260,7 +260,7 @@ angular.module('andes.controllers').controller('AsignarCtrl', function($scope, $
       $rootScope.ok(data.msg);
       $scope.ot = null;
       $scope.enableOp = false;
-      $scope.modoEscaner = "leer";
+      $rootScope.modoEscaner = "leer";
       $scope.activeTab = 'marca';
       $scope.$broadcast('scroll.resize');
       $rootScope.$apply();

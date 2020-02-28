@@ -18,7 +18,7 @@ angular.module('andes.controllers').controller('TerminarCtrl', function($scope, 
   $scope.activeTab = 'people';
   $scope.ot = null;
   $scope.enableOp = false;
-  $scope.modoEscaner = 'leer'; 
+  $rootScope.modoEscaner = 'leer'; 
   $scope.popCloseable = null;
   $scope.add = {moving: true};
 
@@ -37,7 +37,7 @@ angular.module('andes.controllers').controller('TerminarCtrl', function($scope, 
       $scope.activeTab = '';
       $scope.ot = null;
       $scope.enableOp = false;
-      $scope.modoEscaner = 'leer'; 
+      $rootScope.modoEscaner = 'leer'; 
       $scope.popCloseable = null;
       $scope.add = {moving: true};
     }
@@ -52,7 +52,7 @@ angular.module('andes.controllers').controller('TerminarCtrl', function($scope, 
     $scope.activeTab = '';
     $scope.ot = null;
     $scope.enableOp = false;
-    $scope.modoEscaner = 'leer'; 
+    $rootScope.modoEscaner = 'leer'; 
     $scope.popCloseable = null;
     $scope.add = {moving: true};
   }); 
@@ -106,7 +106,7 @@ angular.module('andes.controllers').controller('TerminarCtrl', function($scope, 
   
 
   $scope.$on('scanner', function(event, args) {
-    if ($scope.modoEscaner == "leer") {
+    if ($rootScope.modoEscaner == "leer") {
       $rootScope.showload();
       jQuery.post(app.rest+"ajax.mobile.data.php&a=ot&find=pending_finish&step=" + $stateParams.step, { barra: args.barcode }, function(data) {
         $rootScope.hideload();
@@ -135,12 +135,12 @@ angular.module('andes.controllers').controller('TerminarCtrl', function($scope, 
         }
 
         $scope.enableOp = true;
-        $scope.modoEscaner = "pieza";
+        $rootScope.modoEscaner = "pieza";
         $scope.$broadcast('scroll.resize');
         $rootScope.$apply(); 
       },"json");
     }
-    else if ($scope.modoEscaner == "pieza") {
+    else if ($rootScope.modoEscaner == "pieza") {
       var found = 0;
       for (var i = 0; i < $scope.ot.pieces.length; i++) {
         if ($scope.ot.pieces[i].internalcode == args.barcode) {
@@ -190,7 +190,7 @@ angular.module('andes.controllers').controller('TerminarCtrl', function($scope, 
       $rootScope.ok(data.msg);
       $scope.ot = null;
       $scope.enableOp = false;
-      $scope.modoEscaner = "leer";
+      $rootScope.modoEscaner = "leer";
       $scope.activeTab = 'people';
       $scope.$broadcast('scroll.resize');
       $rootScope.$apply();

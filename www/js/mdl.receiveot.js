@@ -1,7 +1,7 @@
 angular.module('andes.controllers')
 .controller('ReceiveotCtrl', function($scope, $state, $rootScope, $localStorage, $ionicModal, $http, $location, $timeout, $ionicLoading, $ionicPopup, $ionicHistory, $stateParams, $ionicPlatform, $ionicScrollDelegate) {
   $scope.popCloseable = null;
-  $scope.modoEscaner = 'leer';
+  $rootScope.modoEscaner = 'leer';
   $scope.enableOp = false;
   $scope.ot = null;
   $scope.activeTab = 'marca';
@@ -9,7 +9,7 @@ angular.module('andes.controllers')
   $scope.$on('$ionicView.enter', function(obj, viewData){
     if (viewData.direction == 'back') {
       $scope.popCloseable = null;
-      $scope.modoEscaner = 'leer';
+      $rootScope.modoEscaner = 'leer';
       $scope.enableOp = false;
       $scope.ot = null;
       $scope.activeTab = 'marca';
@@ -18,7 +18,7 @@ angular.module('andes.controllers')
 
   $scope.$on('$ionicView.beforeLeave', function(obj, viewData){
     $scope.popCloseable = null;
-    $scope.modoEscaner = 'leer';
+    $rootScope.modoEscaner = 'leer';
     $scope.enableOp = false;
     $scope.ot = null;
     $scope.activeTab = 'marca';
@@ -47,7 +47,7 @@ angular.module('andes.controllers')
     return t;
   } 
   $scope.$on('scanner', function(event, args) { 
-    if ($scope.modoEscaner == "leer") {
+    if ($rootScope.modoEscaner == "leer") {
       $rootScope.showload();
       jQuery.post(app.rest+"ajax.mobile.data.php&a=ot&find=unreceived", { barra: args.barcode }, function(data) {
         $rootScope.hideload();
@@ -75,12 +75,12 @@ angular.module('andes.controllers')
           playerror();
         }
         $scope.enableOp = true;
-        $scope.modoEscaner = "pieza";
+        $rootScope.modoEscaner = "pieza";
         $scope.$broadcast('scroll.resize');
         $rootScope.$apply(); 
       },"json");
     }
-    else if ($scope.modoEscaner == "pieza") {
+    else if ($rootScope.modoEscaner == "pieza") {
       var found = 0;
       for (var i = 0; i < $scope.ot.pieces.length; i++) {
         if ($scope.ot.pieces[i].internalcode == args.barcode) {
@@ -151,7 +151,7 @@ angular.module('andes.controllers')
         $rootScope.ok(data.msg);
         $scope.ot = null;
         $scope.enableOp = false;
-        $scope.modoEscaner = "leer";
+        $rootScope.modoEscaner = "leer";
         $scope.activeTab = 'marca';
         $scope.$broadcast('scroll.resize');
         $rootScope.$apply();

@@ -12,7 +12,7 @@ angular.module('andes.controllers').controller('EntregalibreCtrl', function($sco
 
   $scope.warehouse = $stateParams.warehouse;
   $scope.popCloseable = null;
-  $scope.modoEscaner = 'leer';
+  $rootScope.modoEscaner = 'leer';
   $scope.empresa = '';
   $scope.inventory = [];
   $scope.conteo = 0;
@@ -24,7 +24,7 @@ angular.module('andes.controllers').controller('EntregalibreCtrl', function($sco
     
     if (viewData.direction == 'back') {
       $scope.popCloseable = null;
-      $scope.modoEscaner = 'leer';
+      $rootScope.modoEscaner = 'leer';
       $scope.inventory = [];
       $scope.receptor = "";
       $scope.empresa = '';
@@ -34,7 +34,7 @@ angular.module('andes.controllers').controller('EntregalibreCtrl', function($sco
 
   $scope.$on('$ionicView.beforeLeave', function(obj, viewData){
     $scope.popCloseable = null;
-    $scope.modoEscaner = 'leer';
+    $rootScope.modoEscaner = 'leer';
     $scope.inventory = [];
     $scope.receptor = "";
     $scope.bodega = "";
@@ -42,7 +42,7 @@ angular.module('andes.controllers').controller('EntregalibreCtrl', function($sco
 
   $scope.cancelar = function() {
     $scope.popCloseable = null;
-    $scope.modoEscaner = 'leer';
+    $rootScope.modoEscaner = 'leer';
     $scope.empresa = '';
     $scope.inventory = [];
   }
@@ -57,7 +57,7 @@ angular.module('andes.controllers').controller('EntregalibreCtrl', function($sco
   };
 
   $scope.$on('scanner', function(event, args) {
-    if ($scope.modoEscaner == "leer") {
+    if ($rootScope.modoEscaner == "leer") {
       $rootScope.showload();
       jQuery.post(app.rest+"ajax.mobile.producto.php", { barra:args.barcode }, function(data) {
         $rootScope.hideload();

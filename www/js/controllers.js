@@ -11,6 +11,35 @@ angular.module('andes.controllers', [])
     $state.go('main.selector');
     $ionicSideMenuDelegate.toggleLeft();
   };
+
+  $scope.consultarPieza = function() {
+    $rootScope.prevScanner = $rootScope.modoEscaner;
+    $rootScope.modoEscaner = "consultarPieza";
+    $rootScope.lectorPieza = $rootScope.ok("Lea la pieza a consultar", "Consulta Pieza", function(ok) {
+        console.log('cancelada volviendo a '+$rootScope.prevScanner);
+        $rootScope.modoEscaner = $rootScope.prevScanner;
+    },"Cancelar");
+    $ionicSideMenuDelegate.toggleLeft();
+  };
+
+  $scope.$on('scanner', function(event, args) {
+    if ($rootScope.modoEscaner == "consultarPieza") {
+      event.defaultPrevented = true; 
+      $rootScope.showload();
+      jQuery.post(app.rest+"ajax.mobile.data.php&a=donde", { barra: args.barcode }, function(data) {
+        $rootScope.lectorPieza.close();
+        $rootScope.hideload();
+        if (data.error) { 
+          $rootScope.err(data.error); 
+          playerror();
+          return; 
+        }
+        //console.log(data);
+        $rootScope.ok(data.msg,"Consulta de pieza");
+        
+      },"json");
+    }
+   });
 })
 String.prototype.toBytes = function() {
     var arr = []

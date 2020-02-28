@@ -13,7 +13,7 @@ angular.module('andes.controllers').controller('CambiarCtrl', function($scope, $
   $scope.$on('$destroy', deregisterFirst);
 
   $scope.stepName = '';
-  $scope.modoEscaner = 'leer';
+  $rootScope.modoEscaner = 'leer';
   $scope.packet = [];
   $scope.ejecutor = ""; 
 
@@ -34,7 +34,7 @@ angular.module('andes.controllers').controller('CambiarCtrl', function($scope, $
   $scope.$on('$ionicView.enter', function(obj, viewData){
     if (viewData.direction == 'back') {
       $scope.popCloseable = null;
-      $scope.modoEscaner = 'leer';
+      $rootScope.modoEscaner = 'leer';
       $scope.packet = [];
       $scope.ejecutor = "";
     }
@@ -50,14 +50,14 @@ angular.module('andes.controllers').controller('CambiarCtrl', function($scope, $
 
   $scope.$on('$ionicView.beforeLeave', function(obj, viewData){
     $scope.popCloseable = null;
-    $scope.modoEscaner = 'leer';
+    $rootScope.modoEscaner = 'leer';
     $scope.packet = [];
     $scope.ejecutor = ""; 
   }); 
 
   $scope.cancelar = function() {
     $scope.popCloseable = null;
-    $scope.modoEscaner = 'leer';
+    $rootScope.modoEscaner = 'leer';
     $scope.packet = [];
     $scope.ejecutor = "";
   }
@@ -71,7 +71,7 @@ angular.module('andes.controllers').controller('CambiarCtrl', function($scope, $
   };
 
   $scope.$on('scanner', function(event, args) {
-    if ($scope.modoEscaner == "leer") {
+    if ($rootScope.modoEscaner == "leer") {
       $rootScope.showload();
       jQuery.post(app.rest+"ajax.mobile.data.php&a=moving", { 
         barra: args.barcode, 
