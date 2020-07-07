@@ -88,8 +88,24 @@ angular.module('andes.controllers').controller('ValeCtrl', function($scope, $sta
         $rootScope.$apply();
         $rootScope.err(err.error);
       });
-
     }
+    else if ($rootScope.modoEscaner == "persona") {
+      var str = args.barcode.split('|');
+      if (str.length == 3) {
+        var eid = str[1];
+        for (var x = 0; x < $scope.receptores.length; x++) {
+          if ($scope.receptores[x].id == eid) {
+            $scope.receptor = eid;
+            $scope.confirmada();
+            break;
+          }
+        }
+      } 
+      else {
+        $rootScope.err("Credencial de colaborador no existe");
+        playerror();
+      }
+    } 
 
   });
 
@@ -110,6 +126,7 @@ angular.module('andes.controllers').controller('ValeCtrl', function($scope, $sta
   $scope.setbodega = function(x) { $scope.bodega = x; }
   $scope.closeSalida = function() {
     $scope.modalSalida.hide();
+    $rootScope.modoEscaner = "leer";
   }
   $scope.finishValeconsumo = function() {
     if ($scope.vale.items.length == 0) {
@@ -126,7 +143,7 @@ angular.module('andes.controllers').controller('ValeCtrl', function($scope, $sta
         $rootScope.err("Suma de cantidades parciales deben ser mayor a cero");
         return false;
       }
-
+      $rootScope.modoEscaner = "persona";
       $scope.receptor = "";
       $scope.bodega = "";
       $scope.receptores = [];
@@ -165,18 +182,19 @@ angular.module('andes.controllers').controller('ValeCtrl', function($scope, $sta
         $rootScope.hideload();
         if (data.error) {
           $rootScope.err(data.error);
+          return false;
         }
         else {
           $rootScope.ok(data.msg);
           $scope.vale = null;
           $scope.enableOp = false;
           $scope.modalSalida.hide();
+          $rootScope.modoEscaner = 'leer';
         }        
-      },"json").fail(function(){
-          $rootScope.ok("Proceso realizado");
-          $scope.vale = null;
-          $scope.enableOp = false;
-          $scope.modalSalida.hide();
+      },"json").fail(function(Err){
+          $rootScope.modoEscaner = 'leer';
+          console.log(Err);
+          $rootScope.err("Tiempo agotado, favor reintentar");
       });
 
 

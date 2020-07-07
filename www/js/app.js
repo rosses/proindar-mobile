@@ -250,6 +250,15 @@ angular.module('andes', ['ionic', 'andes.controllers','ngStorage','peanuthub-cus
       step: ''
     }
   }) 
+  .state('main.moverpkg', {
+    url: '/moverpkg',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/moverpkg.html',
+        controller: 'MoverpkgCtrl'
+      }
+    }
+  })
 
 
   //$urlRouterProvider.otherwise('/main/home');
@@ -326,7 +335,7 @@ function playerror() {
 }
 jQuery.ajaxSetup({
   type: 'POST',
-  timeout: 5000,
+  timeout: 45000,
   error: function(xhr) {
     console.log('AjaxSetup Error');
     

@@ -147,7 +147,6 @@ angular.module('andes.controllers').controller('AsignarCtrl', function($scope, $
         $rootScope.err("Credencial de colaborador no existe");
         playerror();
       }
-
     } 
   });
   $scope.groupMarca = function() {

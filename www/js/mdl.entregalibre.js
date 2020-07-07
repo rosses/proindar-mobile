@@ -95,9 +95,24 @@ angular.module('andes.controllers').controller('EntregalibreCtrl', function($sco
         $rootScope.$apply();
         $rootScope.err(err.error);
       });
-
     }
-
+    else if ($rootScope.modoEscaner == "persona") {
+      var str = args.barcode.split('|');
+      if (str.length == 3) {
+        var eid = str[1];
+        for (var x = 0; x < $scope.receptores.length; x++) {
+          if ($scope.receptores[x].id == eid) {
+            $scope.receptor = eid;
+            $scope.confirmada();
+            break;
+          }
+        }
+      } 
+      else {
+        $rootScope.err("Credencial de colaborador no existe");
+        playerror();
+      }
+    } 
   });
 
   $scope.modalSalida = null;
@@ -111,6 +126,7 @@ angular.module('andes.controllers').controller('EntregalibreCtrl', function($sco
 
   $scope.closeSalida = function() {
     $scope.modalSalida.hide();
+    $rootScope.modoEscaner = 'persona';
   }
   $scope.finishConteo = function() {
     if ($scope.inventory.length == 0) {
@@ -123,6 +139,7 @@ angular.module('andes.controllers').controller('EntregalibreCtrl', function($sco
       $scope.empresa = "";
       $scope.bodegas = [];
       $rootScope.showload();
+      $rootScope.modoEscaner = 'persona';
       $ionicModal.fromTemplateUrl('templates/modal_entregalibre.html', {
         scope: $scope,
         animation: 'slide-in-up'
@@ -130,7 +147,7 @@ angular.module('andes.controllers').controller('EntregalibreCtrl', function($sco
         $scope.modalSalida = modal;
         $scope.modalSalida.show();
       });
-      jQuery.get(app.rest+"ajax.mobile.data.php&a=employee", function(data) {
+      jQuery.get(app.rest+"ajax.mobile.data.php&a=employee&all=1", function(data) {
         $scope.receptores = data;
       },"json");
       jQuery.get(app.rest+"ajax.mobile.data.php&a=whs", function(data) {
@@ -174,6 +191,7 @@ angular.module('andes.controllers').controller('EntregalibreCtrl', function($sco
           $rootScope.ok(data.msg);
           $scope.inventory = [];
           $scope.modalSalida.hide();
+          $rootScope.modoEscaner = 'persona';
         }        
       },"json");
 

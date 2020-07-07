@@ -121,7 +121,13 @@ angular.module('andes.controllers').controller('SelectorCtrl',
     $ionicHistory.clearCache();
     $state.go('main.mover');
   };
-
+  $scope.MVPKG = function() {
+    $ionicHistory.nextViewOptions({
+        historyRoot: true
+    });
+    $ionicHistory.clearCache();
+    $state.go('main.moverpkg');
+  }
   
 
   $scope.STOCK = function() {

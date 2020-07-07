@@ -57,6 +57,11 @@
         <button ng-if="perm[16]" class="button button-success" ng-click="CALIDAD('allow')"> GESTIONAR PACKING</button>
         <br /><br />
       </div>
+      <div ng-if="perm[60]">
+        <h2>BODEGA</h2>
+        <button ng-if="perm[60]" class="button button-success" ng-click="MVPKG()"> MOVER PACKING</button>
+        <br /><br />
+      </div>
     </div>
   </ion-content>
   <ion-footer-bar class="bar-assertive">
