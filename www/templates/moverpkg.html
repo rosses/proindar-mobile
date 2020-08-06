@@ -1,83 +1,60 @@
 <ion-view view-title="MOVER PACKING" cache-view="false">
   <ion-content scroll="false" class="home" on-swipe-right="onSwipeRight($event)" on-swipe-left="onSwipeLeft($event)">
-    <div ng-hide="ot">
+    <div ng-hide="packings.length > 0">
       <center>
-        <h3><br /><br />MOVER PACKING - ESCANEE UN PACKING</h3>
+        <h3><br /><br />MOVER PACKING - ESCANEE UNO O MÁS PACKING</h3>
       </center>
     </div>
-    <div ng-hide="!ot">
+    <div ng-hide="packings.length == 0">
       <div class="header">
         <div class="row">
-          <div class="col-67">
+          <div class="col-100">
+            <!--
             <div style='font-size:18px; font-weight:bold;'>OT {{ot.ot}}-{{ot.corr}}</div>
             <b>{{ot.cardname}}</b><br />
-            <div class="paquete">{{getSelected()}} 12</div> 
+            -->
+            <div style='font-size:18px; font-weight:bold;'>MOVIMIENTO DE PACKINGS</div>
           </div>
+          <!--
           <div class="col-33 text-right">
-            <button class="button button-balanced button-small" ng-if="enableOp && ot.pieces.length > 0" ng-click="marcarTodo()">TODO</button>
-            <button class="button button-assertive button-small" ng-if="enableOp && ot.pieces.length > 0" ng-click="desmarcarTodo()">NADA</button>
           </div>
+          -->
         </div>
       </div>
 
       <div class="proindar-tab">
-        <div class="proindar-tab-2" ng-hide="stepName != 'CORTE'">
-          <div class="proindar-in" ng-click="changeTab('panel')" ng-class="{sel: activeTab == 'panel'}">Por p/corte</div>
-        </div><div class="proindar-tab-2" ng-hide="stepName == 'CORTE'">
-          <div class="proindar-in" ng-click="changeTab('lote_internal')" ng-class="{sel: activeTab == 'lote_internal'}">Por lote</div>
-        </div><div class="proindar-tab-2">
-          <div class="proindar-in" ng-click="changeTab('marca')" ng-class="{sel: activeTab == 'marca'}">Por marca</div>
+        <div class="proindar-tab-2">
+          <div class="proindar-in" ng-click="changeTab('panel')" ng-class="{sel: activeTab == 'panel'}">Packing lists</div>
         </div>
       </div>
       <ion-scroll direction="y" class="piece_container">
-        <!-- Agrupar por marca -->
-        <div ng-hide="activeTab == 'panel' || activeTab == 'lote_internal'">
-          <div ng-repeat="grupo in groupMarca()" class="piece-group">
-            <div class="piece-title">
-              <div class="row">
-                <div class="col-67">{{grupo}}</div>
-                <div class="col-33 text-right">
-                  <button class="button button-balanced button-small" ng-if="enableOp && ot.pieces.length > 0" ng-click="changeTodoGrupo('mark',grupo,true)">TODO</button>
-                  <button class="button button-assertive button-small" ng-if="enableOp && ot.pieces.length > 0" ng-click="changeTodoGrupo('mark',grupo,false)">NADA</button>
-                </div>
-              </div>
-            </div>
-            <div class="piece" ng-click="piece.selected = !piece.selected" ng-repeat="piece in groupMarcaPiece(grupo)" ng-class="{on: piece.selected}">
-              {{piece.mark}} / {{piece.corr}}
-            </div>
-          </div>
-        </div>
         <!-- Agrupar por panel -->
-        <div ng-hide="activeTab == 'marca' || activeTab == 'lote_internal'">
-          <div ng-repeat="grupo in groupPanel()" class="piece-group">
-            <div class="piece-title">
+        <div ng-hide="activeTab != 'panel'">
+          <div ng-repeat="packing in packings" class="piece-group">
+            <div class="packing-title">
               <div class="row">
-                <div class="col-67">P{{grupo}}</div>
+                <div class="col-67">{{packing.pkg.name}}<br /></div>
                 <div class="col-33 text-right">
-                  <button class="button button-balanced button-small" ng-if="enableOp && ot.pieces.length > 0" ng-click="changeTodoGrupo('p_module',grupo,true)">TODO</button>
-                  <button class="button button-assertive button-small" ng-if="enableOp && ot.pieces.length > 0" ng-click="changeTodoGrupo('p_module',grupo,false)">NADA</button>
+                  <button ng-click="borrar($index)" class="button button-assertive button-derecha">X</button>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-67">
+                  {{packing.ot.cardname}}
+                </div>
+                <div class="col-33 text-right">
+                  {{packing.pkg.pieces}} piezas
                 </div>
               </div>
             </div>
-            <div class="piece" ng-click="piece.selected = !piece.selected" ng-repeat="piece in groupPanelPiece(grupo)" ng-class="{on: piece.selected}">
-              {{piece.mark}} / {{piece.corr}}
+            <div class="move-packing-badged" ng-click="packing.destination = 0" ng-class="{on: packing.destination == 0}">
+              NO MOVER
             </div>
-          </div> 
-        </div>
-        <!-- Agrupar por lote -->
-        <div ng-hide="activeTab == 'panel' || activeTab == 'marca'">
-          <div ng-repeat="grupo in groupLote()" class="piece-group">
-            <div class="piece-title">
-              <div class="row">
-                <div class="col-67">LOTE {{grupo}}</div>
-                <div class="col-33 text-right">
-                  <button class="button button-balanced button-small" ng-if="enableOp && ot.pieces.length > 0" ng-click="changeTodoGrupo('lote_internal',grupo,true)">TODO</button>
-                  <button class="button button-assertive button-small" ng-if="enableOp && ot.pieces.length > 0" ng-click="changeTodoGrupo('lote_internal',grupo,false)">NADA</button>
-                </div>
-              </div>
+            <div class="move-packing-badged" ng-if="packing.ot.name == 'GALVANIZADO' && packing.pkg.ext_1 == '0'" ng-click="packing.destination = 1" ng-class="{on: packing.destination == 1}">
+              GALVANIZADO
             </div>
-            <div class="piece" ng-click="piece.selected = !piece.selected" ng-repeat="piece in groupLotePiece(grupo)" ng-class="{on: piece.selected}">
-              {{piece.mark}} / {{piece.corr}}
+            <div class="move-packing-badged" ng-click="packing.destination = 2" ng-class="{on: packing.destination == 2}">
+              BODEGA
             </div>
           </div> 
         </div>
@@ -88,8 +65,8 @@
   <ion-footer-bar class="bar-stable">
     <div class="row">
       <div class="col col-100 text-center" style="margin-top: -10px;">
-        <button class="button button-dark" ng-click="cancelarInicio()">CANCELAR</button>
-        <button class="button button-balanced button-small" ng-if="getSelected() > 0" ng-click="prepareInicio()">ASIGNAR {{stepName}}</button>
+        <button class="button button-dark" ng-click="cancelar()">CANCELAR</button>
+        <button class="button button-balanced button-small" ng-if="packings.length > 0" ng-click="prepareMoving()">EJECUTAR</button>
       </div>
     </div>
     

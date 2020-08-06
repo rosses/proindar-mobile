@@ -1,0 +1,26 @@
+<ion-modal-view>
+<ion-header-bar class="bar-assertive">
+  <h1 class="title">FINALIZAR</h1>
+</ion-header-bar>
+<ion-content style="padding:15px; text-align:center;" class="modallle">
+<h4>Seleccione Conductor:</h4>
+<ion-list>
+  <ion-radio name="n_chofer" ng-click="setdriver(b.id)" ng-value="b.id" ng-repeat="b in drivers">{{b.name}}</ion-radio>
+</ion-list>
+<br /><br />
+<h4>Seleccione Patente:</h4>
+<ion-list>
+  <ion-radio name="n_patente" ng-click="setplate(b.id)" ng-value="b.id" ng-repeat="b in plates">{{b.name}}</ion-radio>
+</ion-list>
+
+</ion-content>
+<ion-footer-bar class="bar-stable">
+<div class="row">
+  <div class="col col-100 text-center" style="margin-top: -10px;">
+    <button class="button button-dark" ng-click="closeSalida()">CANCELAR</button>
+    <button class="button button-assertive button-small" ng-click="confirmada()">CONFIRMAR</button>
+  </div>
+</div>
+
+</ion-footer-bar>
+</ion-modal-view>

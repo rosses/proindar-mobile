@@ -94,7 +94,7 @@
         <splash height="480" src="resources/ios/splash/Default~iphone.png" width="320" />
         <splash height="2732" src="resources/ios/splash/Default@2x~universal~anyany.png" width="2732" />
     </platform>
-    <plugin source="git" spec="https://github.com/rosses/cordova-plugin-intent.git" />
+    <plugin source="git" spec="https://github.com/rosses/cordova-plugin-intent.git#ad38e34" />
     <plugin name="cordova-plugin-statusbar" />
     <plugin name="cordova-custom-config" spec="1.2.6" />
     <plugin name="cordova-plugin-dialogs" spec="1.2.1" />

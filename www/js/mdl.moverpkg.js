@@ -10,177 +10,123 @@ angular.module('andes.controllers').controller('MoverpkgCtrl', function($scope, 
     }, 100
   );  
   $scope.$on('$destroy', deregisterFirst);
-
-  $scope.buttonName = "CONFIRMAR TERMINAR";
-
-  $scope.stepName = '';
-  $scope.nextName = '';
-  $scope.activeTab = 'people';
-  $scope.ot = null;
-  $scope.enableOp = false;
+  $scope.modalSalida = null;
+  $scope.activeTab = 'panel';
   $rootScope.modoEscaner = 'leer'; 
-  $scope.popCloseable = null;
-  $scope.add = {moving: true};
-
-  //if ($stateParams.step == "7") { $scope.stepName = "CALIDAD"; }
-  $scope.setStep = function(sx) {
-    $stateParams.step = sx;
-    if ($stateParams.step == "3") { $scope.stepName = "CORTE"; $scope.buttonName = "TERMINO Y LOTEO"; $scope.nextName = "Mover a Armado"; }
-    if ($stateParams.step == "4") { $scope.stepName = "ARMADO"; $scope.nextName = "Mover a Soldadura"; }
-    if ($stateParams.step == "5") { $scope.stepName = "SOLDADURA"; $scope.nextName = "Mover a Terminación"; }
-    if ($stateParams.step == "6") { $scope.stepName = "TERMINACIÓN"; $scope.nextName = "Generar Packing"; }
-  }
-
-  $scope.$on('$ionicView.enter', function(obj, viewData){
-    if (viewData.direction == 'back') {
-      $scope.stepName = '';
-      $scope.activeTab = '';
-      $scope.ot = null;
-      $scope.enableOp = false;
-      $rootScope.modoEscaner = 'leer'; 
-      $scope.popCloseable = null;
-      $scope.add = {moving: true};
-    }
-    //$scope.setStep(3);
-  });
-
-  $scope.setStep($stateParams.step);
-
+  $scope.packings = [];
+  $scope.drivers = [];
+  $scope.plates = [];
+  $scope.moving_to_doc = [];
+  $scope.moving_to_wh = [];
+  $scope.activePackings = [];
+  $scope.driver = "";
+  $scope.plate = "";
 
   $scope.$on('$ionicView.beforeLeave', function(obj, viewData){
-    $scope.stepName = '';
     $scope.activeTab = '';
-    $scope.ot = null;
-    $scope.enableOp = false;
+    $scope.packings = [];
+    $scope.drivers = [];
+    $scope.plates = [];
+    $scope.moving_to_doc = [];
+    $scope.moving_to_wh = [];
+    $scope.driver = "";
+    $scope.plate = "";
+    $scope.activePackings = [];
     $rootScope.modoEscaner = 'leer'; 
-    $scope.popCloseable = null;
-    $scope.add = {moving: true};
   }); 
 
-  $scope.marcarTodo = function() {
-    for (var i = 0; i < $scope.ot.pieces.length; i++) {
-      $scope.ot.pieces[i].selected = true;
-    }
-  };
-  $scope.desmarcarTodo = function() {
-    for (var i = 0; i < $scope.ot.pieces.length; i++) {
-      $scope.ot.pieces[i].selected = false;
-    }
-  };
-
-  $scope.getSelected = function() {
-    var t = 0;
-    if ($scope.ot) {
-      for (var i = 0; i < $scope.ot.pieces.length; i++) {
-        if ($scope.ot.pieces[i].selected) {
-          t++;
-        }
-      }
-    }
-    return t;
-  }
-  $scope.groupPeoplePiece = function(x) {
-    if ($scope.ot) { 
-      return $scope.ot.pieces.filter(function(item){ return item['people'] === x; }).map(function (a) { return a; });
-    }
-  }
-  $scope.groupPeople = function() {
-    var g = [];
-    if ($scope.ot) {
-      for (var i = 0; i < $scope.ot.pieces.length; i++) {
-        if (g.indexOf($scope.ot.pieces[i].people) == -1) {
-          g.push($scope.ot.pieces[i].people);
-        }
-      }
-    }
-    return g;
-  }
-
-  $scope.changeTodoGrupo = function(llave,grupo,b) {
-    if ($scope.ot) { $scope.ot.pieces.filter(function(item){ return item[llave] === grupo; }).map(function (a) { a.selected = b; }); }
-  }
 
   $scope.changeTab = function(a) {
     $scope.activeTab = a;
   }
   
-
+  $scope.borrar = function(i) {
+    $scope.packings.splice(i,1);
+    $scope.activePackings.splice(i,1);
+  }
   $scope.$on('scanner', function(event, args) {
     if ($rootScope.modoEscaner == "leer") {
       $rootScope.showload();
-      jQuery.post(app.rest+"ajax.mobile.data.php&a=ot&find=pending_finish&step=" + $stateParams.step, { barra: args.barcode }, function(data) {
+      jQuery.post(app.rest+"ajax.mobile.data.php&a=movingpacking", { barra: args.barcode }, function(data) {
         $rootScope.hideload();
         if (data.error) { 
           $rootScope.err(data.error); 
           playerror();
           return; 
         }
-        if (data.pieces.length == 0) { 
-          $rootScope.err("No hay piezas para terminar en esta etapa en la OT "+data.ot+"-"+data.corr); 
+        
+        if ($scope.activePackings.indexOf(data.pkg.name) > -1) {
+          $rootScope.err("Packing ya cargado en este movimiento"); 
           playerror();
-          return;
-        }
-        $scope.ot = data;
-        var found = 0;
-        for (var i = 0; i < $scope.ot.pieces.length; i++) {
-          $scope.ot.pieces[i].selected = false;
-          if ($scope.ot.pieces[i].internalcode == args.barcode) {
-            $scope.ot.pieces[i].selected = true;
-            found = 1;
-          }
-        }
-        if (found == 0) {
-          $rootScope.err("Se cargo la OT, pero la pieza no está disponible");
-          playerror();
+          return;  
         }
 
-        $scope.enableOp = true;
-        $rootScope.modoEscaner = "pieza";
+        $scope.packings.push(data);
+        $scope.activePackings.push(data.pkg.name);
         $scope.$broadcast('scroll.resize');
         $rootScope.$apply(); 
       },"json");
-    }
-    else if ($rootScope.modoEscaner == "pieza") {
-      var found = 0;
-      for (var i = 0; i < $scope.ot.pieces.length; i++) {
-        if ($scope.ot.pieces[i].internalcode == args.barcode) {
-          $scope.ot.pieces[i].selected = true;
-          found = 1;
-          break;
-        }
-      }
-      if (found == 0) {
-        $rootScope.err("Pieza no se encuentra en las disponibles");
-        playerror();
-      }
-    } 
+    }  
   });
 
-  $scope.prepareInicio = function() {
-    if ($scope.buttonName == "TERMINO Y LOTEO") {
-      $rootScope.confirmar("Va a cerrar el lote, está seguro?", function() {
-        $scope.confirmada();
-      });
+  $scope.prepareMoving = function() {
+    $scope.moving_to_doc = $scope.packings.filter(({ destination }) => destination == 1).map(({ pkg }) => pkg.name);
+    $scope.moving_to_wh = $scope.packings.filter(({ destination }) => destination == 2).map(({ pkg }) => pkg.name);
+    if ($scope.moving_to_wh.length + $scope.moving_to_doc.length == 0) {
+      $rootScope.err("No estás moviendo nada");
+      return;
     }
-    else if ($stateParams.step == "6") {
-      $rootScope.confirmar("Dejar disponible para packing list?", function() {
-        $scope.confirmada();
+    if ($scope.moving_to_doc.length > 0) {
+      $ionicModal.fromTemplateUrl('templates/modal_camion.html', {
+        scope: $scope,
+        animation: 'slide-in-up'
+      }).then(function(modal) {
+        $scope.modalSalida = modal;
+        $scope.modalSalida.show();
       });
+      $rootScope.showload();
+      jQuery.get(app.rest+"ajax.mobile.data.php&a=drivers", function(data) {
+        $scope.drivers = data.drivers;
+        $scope.plates = data.plates;
+        $rootScope.hideload();
+      },"json");
+
     }
     else {
-      $rootScope.confirmar("Terminar etapa y avanzar a la siguiente, está seguro?", function() {
+      $rootScope.confirmar("Va a mover los packings, está seguro?", function() {
         $scope.confirmada();
       });
     }
   }
-
+  $scope.closeSalida = function() {
+    $scope.modalSalida.hide();
+  }
+  $scope.setdriver = function(z) {
+    $scope.driver = z;
+  }
+  $scope.setplate = function(z) {
+    $scope.plate = z;
+  }
   $scope.confirmada = function() {
+
+    if ($scope.moving_to_doc.length > 0 && $scope.driver == "")  {
+      $rootScope.err("Debe indicar conductor");
+      return;
+    }
+    if ($scope.moving_to_doc.length > 0 && $scope.plate == "")  {
+      $rootScope.err("Debe indicar patente");
+      return;
+    }
+    if ($scope.modalSalida) {
+      $scope.modalSalida.hide();
+    }
     $rootScope.showload();
-    var moving = $scope.ot.pieces.filter(({ selected }) => selected).map(({ internalcode }) => internalcode);
-    jQuery.post(app.rest+"ajax.mobile.data.php&a=finish", { 
-      closing: $stateParams.step,
-      pieces: moving,
-      by: localStorage.getItem('user') 
+    jQuery.post(app.rest+"ajax.mobile.data.php&a=sendpacking", { 
+      docs: $scope.moving_to_doc,
+      whs: $scope.moving_to_wh,
+      by: localStorage.getItem('user'), 
+      chofer: $scope.driver,
+      patente: $scope.plate
     }, function(data) {
       $rootScope.hideload();
       if (data.error) {
@@ -188,16 +134,22 @@ angular.module('andes.controllers').controller('MoverpkgCtrl', function($scope, 
         return;
       }
       $rootScope.ok(data.msg);
-      $scope.ot = null;
-      $scope.enableOp = false;
+      
+      $scope.packings = [];
+      $scope.drivers = [];
+      $scope.plates = [];
+      $scope.activePackings = [];
+      $scope.driver = "";
+      $scope.plate = "";
       $rootScope.modoEscaner = "leer";
-      $scope.activeTab = 'people';
+      $scope.activeTab = 'panel';
       $scope.$broadcast('scroll.resize');
       $rootScope.$apply();
     },"json"); 
+    
   };
-  $scope.cancelarTermino = function() {
-    if ($scope.ot) { $rootScope.confirmar("Cancelar?", function() { $scope.chao(); }); }
+  $scope.cancelar = function() {
+    if ($scope.packings.length > 0) { $rootScope.confirmar("Cancelar?", function() { $scope.chao(); }); }
     else { $scope.chao(); }
   }
   $scope.chao = function() {
